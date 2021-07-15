@@ -1,0 +1,30 @@
+name: IslandWorldEdit
+version: ${project.version}
+main: fr.traqueur.smeltblock.worldedit.IslandWorldEdit
+api-version: 1.16
+prefix: IslandWorldEdit
+depend: [ Vault, SuperiorSkyblock2, GenCubes, IslandMobCubes, QuestCreator, Jobs ]
+authors: [ Traqueur_ ]
+description: Plugin like WorldEdit but player paid and block is not limitless
+commands:
+  givewand:
+  cut:
+    aliases: casser
+  cyl:
+    aliases: cercle
+  fill:
+    aliases: remplir
+  replace:
+    aliases: remplacer
+  set:
+    aliases: [poser, placer]
+  sphere:
+    aliases: sph
+  walls:
+    aliases: [mur, wall]
+  cancel:
+    aliases: stopper
+  undo:
+    aliases: annuler
+  count:
+    aliases: calculer
