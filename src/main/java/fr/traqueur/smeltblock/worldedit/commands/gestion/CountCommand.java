@@ -2,7 +2,7 @@ package fr.traqueur.smeltblock.worldedit.commands.gestion;
 
 import java.util.List;
 
-import fr.traqueur.smeltblock.worldedit.managers.WorldEditManager;
+import fr.traqueur.smeltblock.worldedit.managers.worldedit.WorldEditManager;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;

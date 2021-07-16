@@ -2,8 +2,8 @@ package fr.traqueur.smeltblock.worldedit.tasks.replace;
 
 import java.util.LinkedList;
 
-import fr.traqueur.smeltblock.worldedit.managers.WorldEditManager;
-import fr.traqueur.smeltblock.worldedit.managers.clazz.TypeCommand;
+import fr.traqueur.smeltblock.worldedit.managers.worldedit.WorldEditManager;
+import fr.traqueur.smeltblock.worldedit.managers.worldedit.clazz.TypeCommand;
 import fr.traqueur.smeltblock.worldedit.tasks.AbstractReplaceBlockRunnable;
 import org.bukkit.Material;
 import org.bukkit.block.Block;

@@ -1,6 +1,6 @@
 package fr.traqueur.smeltblock.worldedit.api.utils;
 
-import fr.traqueur.smeltblock.worldedit.managers.WorldEditManager;
+import fr.traqueur.smeltblock.worldedit.managers.worldedit.WorldEditManager;
 import org.bukkit.command.CommandSender;
 
 public class Utils {

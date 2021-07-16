@@ -1,6 +1,6 @@
 package fr.traqueur.smeltblock.worldedit.commands.gestion;
 
-import fr.traqueur.smeltblock.worldedit.managers.WorldEditManager;
+import fr.traqueur.smeltblock.worldedit.managers.worldedit.WorldEditManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

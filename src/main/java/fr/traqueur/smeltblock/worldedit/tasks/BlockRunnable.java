@@ -3,7 +3,7 @@ package fr.traqueur.smeltblock.worldedit.tasks;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import fr.traqueur.smeltblock.worldedit.managers.WorldEditManager;
+import fr.traqueur.smeltblock.worldedit.managers.worldedit.WorldEditManager;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -17,7 +17,7 @@ import com.google.common.collect.Maps;
 import fr.dorvak.smeltblock.IslandMobCubes;
 import fr.dorvak.smeltblock.core.Cube;
 import fr.traqueur.smeltblock.worldedit.api.utils.InventoryUtils;
-import fr.traqueur.smeltblock.worldedit.managers.clazz.Config;
+import fr.traqueur.smeltblock.worldedit.managers.worldedit.clazz.Config;
 import us.lynuxcraft.deadsilenceiv.gencubes.GenCubesAPI;
 import us.lynuxcraft.deadsilenceiv.gencubes.gencube.GenCube;
 

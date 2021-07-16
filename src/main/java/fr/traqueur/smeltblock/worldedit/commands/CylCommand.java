@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import fr.traqueur.smeltblock.worldedit.api.utils.Cuboid;
-import fr.traqueur.smeltblock.worldedit.managers.WorldEditManager;
+import fr.traqueur.smeltblock.worldedit.managers.worldedit.WorldEditManager;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -16,7 +16,7 @@ import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
 
 import fr.traqueur.smeltblock.worldedit.api.utils.Utils;
-import fr.traqueur.smeltblock.worldedit.managers.clazz.TypeCommand;
+import fr.traqueur.smeltblock.worldedit.managers.worldedit.clazz.TypeCommand;
 
 public class CylCommand implements CommandExecutor, TabCompleter {
 

@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import fr.traqueur.smeltblock.worldedit.api.MultiThreading;
+import fr.traqueur.smeltblock.worldedit.api.inventory.InventoryManager;
 import fr.traqueur.smeltblock.worldedit.api.jsons.JsonPersist;
 import fr.traqueur.smeltblock.worldedit.api.jsons.adapters.LocationAdapter;
 import fr.traqueur.smeltblock.worldedit.api.utils.Logger;
@@ -12,10 +13,13 @@ import fr.traqueur.smeltblock.worldedit.commands.admin.GiveWandCommand;
 import fr.traqueur.smeltblock.worldedit.commands.gestion.CancelCommand;
 import fr.traqueur.smeltblock.worldedit.commands.gestion.CountCommand;
 import fr.traqueur.smeltblock.worldedit.commands.gestion.UndoCommand;
+import fr.traqueur.smeltblock.worldedit.commands.gui.GuiCommand;
 import fr.traqueur.smeltblock.worldedit.listeners.InteractListener;
 import fr.traqueur.smeltblock.worldedit.listeners.JobsListener;
 import fr.traqueur.smeltblock.worldedit.listeners.PlayerListener;
-import fr.traqueur.smeltblock.worldedit.managers.WorldEditManager;
+import fr.traqueur.smeltblock.worldedit.managers.profiles.ProfileManager;
+import fr.traqueur.smeltblock.worldedit.managers.worldedit.WorldEditManager;
+import me.arcaniax.hdb.api.HeadDatabaseAPI;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -30,28 +34,32 @@ import java.util.concurrent.TimeUnit;
 public class IslandWorldEdit extends JavaPlugin {
 
 	private static IslandWorldEdit instance;
+	private static InventoryManager invManager;
 
 	private Gson gson;
 	private Economy economy;
+	private HeadDatabaseAPI headApi;
 	private List<JsonPersist> persists;
 
 	public IslandWorldEdit() {
 		instance = this;
 	}
 
-	@Override
+    @Override
 	public void onEnable() {
 		super.onEnable();
 		this.getDataFolder().mkdir();
 		this.gson = this.createGsonBuilder().create();
+		this.headApi = new HeadDatabaseAPI();
 		this.persists = Lists.newArrayList();
 
 		this.persists.add(new WorldEditManager());
+		this.persists.add(new ProfileManager());
 
-		if(!this.setupEconomy()) {
-			Bukkit.shutdown();
-			Logger.error("No Economy Plugin detected...");
-		}
+		this.setupEconomy();
+
+		invManager = new InventoryManager(this);
+		invManager.init();
 
 		this.loadPersists();
 		this.loadCommands();
@@ -81,11 +89,12 @@ public class IslandWorldEdit extends JavaPlugin {
 		this.getCommand("set").setExecutor(new SetCommand());
 		this.getCommand("sphere").setExecutor(new SphereCommand());
 		this.getCommand("walls").setExecutor(new WallsCommand());
+		this.getCommand("worldedit").setExecutor(new GuiCommand());
 	}
 
 	@Override
 	public void onDisable() {
-		super.onDisable();
+		this.savePersists();
 		MultiThreading.POOL.shutdown();
 		MultiThreading.RUNNABLE_POOL.shutdown();
 	}
@@ -102,17 +111,17 @@ public class IslandWorldEdit extends JavaPlugin {
 		return ret;
 	}
 
-	private boolean setupEconomy() {
+	private void setupEconomy() {
 		RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager()
 				.getRegistration(Economy.class);
 		if (economyProvider != null)
 			this.economy = economyProvider.getProvider();
-		return (this.economy != null);
 	}
 
 	public void loadPersists() {
-		for (JsonPersist persist : this.persists) {
-			persist.loadData();
+		List<JsonPersist> jsonPersists = this.persists;
+		for (JsonPersist jsonPersist : jsonPersists) {
+			jsonPersist.loadData();
 		}
 	}
 
@@ -133,12 +142,18 @@ public class IslandWorldEdit extends JavaPlugin {
 		return this.gson;
 	}
 
+	public Economy getEconomy() {
+		return economy;
+	}
+
+	public HeadDatabaseAPI getHeadApi() {
+		return headApi;
+	}
+
 	public static IslandWorldEdit getInstance() {
 		return instance;
 	}
 
-	public Economy getEconomy() {
-		return economy;
-	}
+	public static InventoryManager manager() { return invManager; }
 
 }

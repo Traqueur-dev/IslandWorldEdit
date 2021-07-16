@@ -1,4 +1,4 @@
-package fr.traqueur.smeltblock.worldedit.managers;
+package fr.traqueur.smeltblock.worldedit.managers.worldedit;
 
 import java.io.File;
 import java.lang.reflect.Type;
@@ -39,9 +39,9 @@ import de.tr7zw.changeme.nbtapi.NBTItem;
 import fr.traqueur.smeltblock.worldedit.IslandWorldEdit;
 import fr.traqueur.smeltblock.worldedit.api.utils.InventoryUtils;
 import fr.traqueur.smeltblock.worldedit.api.utils.Utils;
-import fr.traqueur.smeltblock.worldedit.managers.clazz.Config;
-import fr.traqueur.smeltblock.worldedit.managers.clazz.TypeCommand;
-import fr.traqueur.smeltblock.worldedit.managers.clazz.Wand;
+import fr.traqueur.smeltblock.worldedit.managers.worldedit.clazz.Config;
+import fr.traqueur.smeltblock.worldedit.managers.worldedit.clazz.TypeCommand;
+import fr.traqueur.smeltblock.worldedit.managers.worldedit.clazz.Wand;
 import fr.traqueur.smeltblock.worldedit.tasks.BlockRunnable;
 import fr.traqueur.smeltblock.worldedit.tasks.destroy.DestroyBlockToBlockRunnable;
 import fr.traqueur.smeltblock.worldedit.tasks.place.PlaceBlockToBlockRunnable;

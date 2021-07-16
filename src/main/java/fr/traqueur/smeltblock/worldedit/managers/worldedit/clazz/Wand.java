@@ -1,4 +1,4 @@
-package fr.traqueur.smeltblock.worldedit.managers.clazz;
+package fr.traqueur.smeltblock.worldedit.managers.worldedit.clazz;
 
 import java.util.List;
 
