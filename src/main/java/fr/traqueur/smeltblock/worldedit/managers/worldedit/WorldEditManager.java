@@ -1,16 +1,30 @@
 package fr.traqueur.smeltblock.worldedit.managers.worldedit;
 
-import java.io.File;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
-
+import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.gson.reflect.TypeToken;
+import com.guillaumevdn.questcreator.data.BoardLocalQC;
+import de.tr7zw.changeme.nbtapi.NBTItem;
+import fr.traqueur.smeltblock.worldedit.IslandWorldEdit;
 import fr.traqueur.smeltblock.worldedit.api.jsons.DiscUtil;
 import fr.traqueur.smeltblock.worldedit.api.jsons.JsonPersist;
 import fr.traqueur.smeltblock.worldedit.api.utils.Cuboid;
+import fr.traqueur.smeltblock.worldedit.api.utils.InventoryUtils;
+import fr.traqueur.smeltblock.worldedit.api.utils.Utils;
+import fr.traqueur.smeltblock.worldedit.gui.clazz.GUItem;
+import fr.traqueur.smeltblock.worldedit.managers.profiles.ProfileManager;
+import fr.traqueur.smeltblock.worldedit.managers.worldedit.clazz.Config;
+import fr.traqueur.smeltblock.worldedit.managers.worldedit.clazz.TypeCommand;
+import fr.traqueur.smeltblock.worldedit.managers.worldedit.clazz.Wand;
+import fr.traqueur.smeltblock.worldedit.tasks.BlockRunnable;
+import fr.traqueur.smeltblock.worldedit.tasks.destroy.DestroyBlockToBlockRunnable;
+import fr.traqueur.smeltblock.worldedit.tasks.place.PlaceBlockToBlockRunnable;
+import fr.traqueur.smeltblock.worldedit.tasks.replace.ReplaceBlockToBlockRunnable;
+import net.minecraft.server.v1_16_R3.BlockPosition;
+import net.minecraft.server.v1_16_R3.IBlockData;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -26,448 +40,446 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 
-import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
-import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.primitives.Ints;
-import com.google.gson.reflect.TypeToken;
-import com.guillaumevdn.questcreator.data.BoardLocalQC;
-
-import de.tr7zw.changeme.nbtapi.NBTItem;
-import fr.traqueur.smeltblock.worldedit.IslandWorldEdit;
-import fr.traqueur.smeltblock.worldedit.api.utils.InventoryUtils;
-import fr.traqueur.smeltblock.worldedit.api.utils.Utils;
-import fr.traqueur.smeltblock.worldedit.managers.worldedit.clazz.Config;
-import fr.traqueur.smeltblock.worldedit.managers.worldedit.clazz.TypeCommand;
-import fr.traqueur.smeltblock.worldedit.managers.worldedit.clazz.Wand;
-import fr.traqueur.smeltblock.worldedit.tasks.BlockRunnable;
-import fr.traqueur.smeltblock.worldedit.tasks.destroy.DestroyBlockToBlockRunnable;
-import fr.traqueur.smeltblock.worldedit.tasks.place.PlaceBlockToBlockRunnable;
-import fr.traqueur.smeltblock.worldedit.tasks.replace.ReplaceBlockToBlockRunnable;
-import net.minecraft.server.v1_16_R3.BlockPosition;
-import net.minecraft.server.v1_16_R3.IBlockData;
+import java.io.File;
+import java.lang.reflect.Type;
+import java.util.*;
 
 public class WorldEditManager implements JsonPersist {
 
-	private static WorldEditManager singleton;
+    private static WorldEditManager singleton;
 
-	private HashMap<UUID, Location[]> corners;
-	private HashMap<UUID, BlockRunnable> inWE;
-	private Config config;
-	private Wand wand;
+    private HashMap<UUID, Location[]> corners;
+    private HashMap<UUID, BlockRunnable> inWE;
+    private Config config;
+    private Wand wand;
 
-	public WorldEditManager() {
-		singleton = this;
-		this.inWE =  Maps.newHashMap();
-		this.corners = Maps.newHashMap();
-		this.config = new Config();
-		this.wand = new Wand(Material.BLAZE_ROD, "Baton Magique", Arrays.asList("Lore 1", "Lore 2"));
+    public WorldEditManager() {
+        singleton = this;
+        this.inWE = Maps.newHashMap();
+        this.corners = Maps.newHashMap();
+        this.config = new Config();
+        this.wand = new Wand(Material.BLAZE_ROD, "Baton Magique", Arrays.asList("Lore 1", "Lore 2"));
 
-	}
+    }
 
-	public void setBlockInNativeWorld(Location loc, BlockData blockData, boolean applyPhysics) {
-		net.minecraft.server.v1_16_R3.World nmsWorld = ((CraftWorld) loc.getWorld()).getHandle();
-		IBlockData data = ((CraftBlockData) blockData).getState();
-		nmsWorld.setTypeAndData(new BlockPosition(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()), data, applyPhysics ? 3 : 2);
-		loc.getBlock().setMetadata("worldEdited", new FixedMetadataValue(IslandWorldEdit.getInstance(), true));
-		BoardLocalQC.inst().setPlacedByPlayer(loc.getBlock());
-	}
-	
-	public int getAmount(Player p, Material m) {
-		int count = 0;
-		for (ItemStack i : p.getInventory().getContents()) {
-			if (i != null && i.getType().equals(m)) {
-				count += i.getAmount();
-			}
-		}
-		return count;
-	}
-	
-	public void setBlock(Player player, List<Block> cuboid, Material item,
-			boolean replace, TypeCommand command) {
-		this.getCuboid(player).loadChunks();
-		BlockRunnable runnable;
-		runnable = new PlaceBlockToBlockRunnable(player,Lists.newLinkedList(cuboid), item, command, replace);
-		runnable.runTaskTimer(IslandWorldEdit.getInstance(), 0, 1);
-		inWE.put(player.getUniqueId(), runnable);
-		this.decrementWand(player);
-	}
-	
-	public void replaceBlocks(Player player, List<Block> cuboid, Material item,
-			Material newItem, TypeCommand command) {
-		this.getCuboid(player).loadChunks();
-		BlockRunnable runnable;
-		runnable = new ReplaceBlockToBlockRunnable(player,Lists.newLinkedList(cuboid), item, command, newItem);
-		runnable.runTaskTimer(IslandWorldEdit.getInstance(), 0, 1);
-		inWE.put(player.getUniqueId(), runnable);
-		this.decrementWand(player);
-	}
+    public static WorldEditManager getSingleton() {
+        return singleton;
+    }
 
-	public void setDifferentCuboid(Player player, List<Location> cuboid, Material item, TypeCommand command) {
-		List<Block> blocks = Lists.newArrayList();
-		for (Location l : cuboid) {
-			blocks.add(l.getBlock());
-		}
-		this.setBlock(player, blocks, item, true, command);
-	}
-	
-	public void destroyBlocks(Player player, List<Block> cuboid, Material item) {
-		this.getCuboid(player).loadChunks();
-		BlockRunnable runnable;
-		runnable = new DestroyBlockToBlockRunnable(player,Lists.newLinkedList(cuboid), item, TypeCommand.CUT);
-		runnable.runTaskTimer(IslandWorldEdit.getInstance(), 0, 1);
-		inWE.put(player.getUniqueId(), runnable);
-		this.decrementWand(player);
-	}
+    public void setBlockInNativeWorld(Location loc, BlockData blockData, boolean applyPhysics) {
+        net.minecraft.server.v1_16_R3.World nmsWorld = ((CraftWorld) loc.getWorld()).getHandle();
+        IBlockData data = ((CraftBlockData) blockData).getState();
+        nmsWorld.setTypeAndData(new BlockPosition(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()), data, applyPhysics ? 3 : 2);
+        loc.getBlock().setMetadata("worldEdited", new FixedMetadataValue(IslandWorldEdit.getInstance(), true));
+        BoardLocalQC.inst().setPlacedByPlayer(loc.getBlock());
+    }
 
-	public ArrayList<Location> getWalls(Player p) {
-		Cuboid cube = this.getCuboid(p);
-		ArrayList<Location> list = new ArrayList<>();
-		int minX = cube.getLowerX();
-		int maxX = cube.getUpperX();
-		int minY = cube.getLowerY();
-		int maxY = cube.getUpperY();
-		int minZ = cube.getLowerZ();
-		int maxZ = cube.getUpperZ();
-		World w = cube.getWorld();
-		for (int i = minX; i <= maxX; i++) {
-			for (int y = minY; y <= maxY; y++)
-				list.add(new Location(w, i, y, minZ));
-		}
-		int z;
-		for (z = minZ; z <= maxZ; z++) {
-			for (int y = minY; y <= maxY; y++)
-				list.add(new Location(w, minX, y, z));
-		}
-		for (z = minZ; z <= maxZ; z++) {
-			for (int y = minY; y <= maxY; y++)
-				list.add(new Location(w, maxX, y, z));
-		}
-		for (int x = minX; x <= maxX; x++) {
-			for (int y = minY; y <= maxY; y++)
-				list.add(new Location(w, x, y, maxZ));
-		}
-		return list;
-	}
+    public int getAmount(Player p, Material m) {
+        int count = 0;
+        for (ItemStack i : p.getInventory().getContents()) {
+            if (i != null && i.getType().equals(m)) {
+                count += i.getAmount();
+            }
+        }
+        if (p.hasPermission("we.gui.use")) {
+            GUItem g = ProfileManager.getSingleton().getProfile(p).get(m);
+            if (g != null) {
+                count += g.getAmount();
+            }
+        }
 
-	public List<Location> getCyl(Player p, int height, boolean filled) {
-		ArrayList<Location> list = Lists.newArrayList();
-		Cuboid cube = this.getCuboid(p);
-		double radius = Math.max(cube.getUpperX() - cube.getLowerX(), cube.getUpperZ() - cube.getLowerZ()) / 2 + 0.5;
-		int ceilRadius = (int) Math.ceil(radius);
+        return count;
+    }
 
-		for (int y = 0; y < height; y++) {
-			for (int x = -ceilRadius; x <= ceilRadius; x++) {
-				for (int z = -ceilRadius; z <= ceilRadius; z++) {
-					if (x * x + z * z < radius * radius) {
-						if (!filled) {
-							if (lengthSq(x, z) <= (radius * radius) - (radius*2)) {
-								continue;
-							}
-						}
-						list.add(cube.getCenter().getBlock().getRelative(x, y, z).getLocation());
-					}
+    public void setBlock(Player player, List<Block> cuboid, Material item,
+                         boolean replace, TypeCommand command) {
+        this.getCuboid(player).loadChunks();
+        BlockRunnable runnable;
+        runnable = new PlaceBlockToBlockRunnable(player, Lists.newLinkedList(cuboid), item, command, replace);
+        runnable.runTaskTimer(IslandWorldEdit.getInstance(), 0, 1);
+        inWE.put(player.getUniqueId(), runnable);
+        this.decrementWand(player);
+    }
 
-				}
-			}
-		}
+    public void replaceBlocks(Player player, List<Block> cuboid, Material item,
+                              Material newItem, TypeCommand command) {
+        this.getCuboid(player).loadChunks();
+        BlockRunnable runnable;
+        runnable = new ReplaceBlockToBlockRunnable(player, Lists.newLinkedList(cuboid), item, command, newItem);
+        runnable.runTaskTimer(IslandWorldEdit.getInstance(), 0, 1);
+        inWE.put(player.getUniqueId(), runnable);
+        this.decrementWand(player);
+    }
 
-		return list;
-	}
+    public void setDifferentCuboid(Player player, List<Location> cuboid, Material item, TypeCommand command) {
+        List<Block> blocks = Lists.newArrayList();
+        for (Location l : cuboid) {
+            blocks.add(l.getBlock());
+        }
+        this.setBlock(player, blocks, item, true, command);
+    }
 
-	public List<Location> getSphere(Player p, boolean filled) {
-		ArrayList<Location> list = Lists.newArrayList();
-		Cuboid cube = this.getCuboid(p);
-		double radius = Math.max(cube.getUpperX() - cube.getLowerX(), cube.getUpperZ() - cube.getLowerZ()) / 2 + 0.5;
-		int ceilRadius = (int) Math.ceil(radius);
-		for (int y = -ceilRadius; y <= ceilRadius; y++) {
-			for (int x = -ceilRadius; x <= ceilRadius; x++) {
-				for (int z = -ceilRadius; z <= ceilRadius; z++) {
-					if (x * x + z * z + y * y < radius * radius) {
-						if (!filled) {
-							if (lengthSq(x, y, z) <= (radius * radius) - (radius*2)) {
-								continue;
-							}
-						}
-						list.add(cube.getCenter().getBlock().getRelative(x, y, z).getLocation());
-					}
+    public void destroyBlocks(Player player, List<Block> cuboid, Material item) {
+        this.getCuboid(player).loadChunks();
+        BlockRunnable runnable;
+        runnable = new DestroyBlockToBlockRunnable(player, Lists.newLinkedList(cuboid), item, TypeCommand.CUT);
+        runnable.runTaskTimer(IslandWorldEdit.getInstance(), 0, 1);
+        inWE.put(player.getUniqueId(), runnable);
+        this.decrementWand(player);
+    }
 
-				}
-			}
-		}
-		return list;
-	}
-	
-	private double lengthSq(double x, double y, double z) {
-		return (x * x) + (y * y) + (z * z);
-	}
+    public ArrayList<Location> getWalls(Player p) {
+        Cuboid cube = this.getCuboid(p);
+        ArrayList<Location> list = new ArrayList<>();
+        int minX = cube.getLowerX();
+        int maxX = cube.getUpperX();
+        int minY = cube.getLowerY();
+        int maxY = cube.getUpperY();
+        int minZ = cube.getLowerZ();
+        int maxZ = cube.getUpperZ();
+        World w = cube.getWorld();
+        for (int i = minX; i <= maxX; i++) {
+            for (int y = minY; y <= maxY; y++)
+                list.add(new Location(w, i, y, minZ));
+        }
+        int z;
+        for (z = minZ; z <= maxZ; z++) {
+            for (int y = minY; y <= maxY; y++)
+                list.add(new Location(w, minX, y, z));
+        }
+        for (z = minZ; z <= maxZ; z++) {
+            for (int y = minY; y <= maxY; y++)
+                list.add(new Location(w, maxX, y, z));
+        }
+        for (int x = minX; x <= maxX; x++) {
+            for (int y = minY; y <= maxY; y++)
+                list.add(new Location(w, x, y, maxZ));
+        }
+        return list;
+    }
 
-	private double lengthSq(double x, double z) {
-		return (x * x) + (z * z);
-	}
-	
-	public double getPrice(Material m, int quantity, TypeCommand command) {
-		double price = m != null && config.getPriceBlocks().containsKey(m.name()) ? config.getPriceBlocks().get(m.name())
-				: config.getDefaultPrice();
-		double pourcent;
-		switch (command) {
-		case CUT:
-			pourcent = config.getPourcentCutCommand();
-			price = price + (price * pourcent);
-			break;
-		case FILL:
-			pourcent = config.getPourcentFillCommand();
-			price = price + (price * pourcent);
-			break;
-		case SET:
-			pourcent = config.getPourcentSetCommand();
-			price = price + (price * pourcent);
-			break;
-		case CYL:
-			pourcent = config.getPourcentCylCommand();
-			price = price + (price * pourcent);
-			break;
-		case REPLACE:
-			pourcent = config.getPourcentReplaceCommand();
-			price = price + (price * pourcent);
-			break;
-		case WALLS:
-			pourcent = config.getPourcentWallsCommand();
-			price = price + (price * pourcent);
-			break;
-		default:
-			break;
-		}
-		return price*quantity;
-	}
+    public List<Location> getCyl(Player p, int height, boolean filled) {
+        ArrayList<Location> list = Lists.newArrayList();
+        Cuboid cube = this.getCuboid(p);
+        double radius = Math.max(cube.getUpperX() - cube.getLowerX(), cube.getUpperZ() - cube.getLowerZ()) / 2 + 0.5;
+        int ceilRadius = (int) Math.ceil(radius);
 
-	public List<String> getAllowedBlocks() {
-		List<String> list = Lists.newArrayList();
-		for (Material mat : Material.values()) {
-			if (mat.isBlock() && !config.getIgnoredBlocks().contains(mat.name()))
-				list.add(mat.name());
-		}
-		return list;
-	}
+        for (int y = 0; y < height; y++) {
+            for (int x = -ceilRadius; x <= ceilRadius; x++) {
+                for (int z = -ceilRadius; z <= ceilRadius; z++) {
+                    if (x * x + z * z < radius * radius) {
+                        if (!filled) {
+                            if (lengthSq(x, z) <= (radius * radius) - (radius * 2)) {
+                                continue;
+                            }
+                        }
+                        list.add(cube.getCenter().getBlock().getRelative(x, y, z).getLocation());
+                    }
 
-	public boolean goodCommand(CommandSender sender) {
-		if (!(sender instanceof Player)) {
-			Utils.sendMessage(sender, "&cLa commande ne peut-être exécuté qu'en jeu.");
-			return false;
-		}
+                }
+            }
+        }
 
-		Player player = (Player) sender;
+        return list;
+    }
 
-		if (!player.hasPermission("we.commands.cut")) {
-			Utils.sendMessage(player, "&cVous n'avez pas la permission de faire cela !");
-			return false;
-		}
+    public List<Location> getSphere(Player p, boolean filled) {
+        ArrayList<Location> list = Lists.newArrayList();
+        Cuboid cube = this.getCuboid(p);
+        double radius = Math.max(cube.getUpperX() - cube.getLowerX(), cube.getUpperZ() - cube.getLowerZ()) / 2 + 0.5;
+        int ceilRadius = (int) Math.ceil(radius);
+        for (int y = -ceilRadius; y <= ceilRadius; y++) {
+            for (int x = -ceilRadius; x <= ceilRadius; x++) {
+                for (int z = -ceilRadius; z <= ceilRadius; z++) {
+                    if (x * x + z * z + y * y < radius * radius) {
+                        if (!filled) {
+                            if (lengthSq(x, y, z) <= (radius * radius) - (radius * 2)) {
+                                continue;
+                            }
+                        }
+                        list.add(cube.getCenter().getBlock().getRelative(x, y, z).getLocation());
+                    }
 
-		Cuboid cuboid = this.getCuboid(player);
+                }
+            }
+        }
+        return list;
+    }
 
-		if (this.isOnWE(player)) {
-			Utils.sendMessage(player, "&cVous êtes déjà en train de faire une commande.");
-			return false;
-		}
+    private double lengthSq(double x, double y, double z) {
+        return (x * x) + (y * y) + (z * z);
+    }
 
-		if (cuboid == null) {
-			Utils.sendMessage(player, "&cVos positions ne sont pas définies.");
-			return false;
-		}
+    private double lengthSq(double x, double z) {
+        return (x * x) + (z * z);
+    }
 
-		if (!this.positionsIsSameWorld(player)) {
-			Utils.sendMessage(player, "&cVos positions ne sont pas dans le même monde.");
-			return false;
-		}
+    public double getPrice(Material m, int quantity, TypeCommand command) {
+        double price = m != null && config.getPriceBlocks().containsKey(m.name()) ? config.getPriceBlocks().get(m.name())
+                : config.getDefaultPrice();
+        double pourcent;
+        switch (command) {
+            case CUT:
+                pourcent = config.getPourcentCutCommand();
+                price = price + (price * pourcent);
+                break;
+            case FILL:
+                pourcent = config.getPourcentFillCommand();
+                price = price + (price * pourcent);
+                break;
+            case SET:
+                pourcent = config.getPourcentSetCommand();
+                price = price + (price * pourcent);
+                break;
+            case CYL:
+                pourcent = config.getPourcentCylCommand();
+                price = price + (price * pourcent);
+                break;
+            case REPLACE:
+                pourcent = config.getPourcentReplaceCommand();
+                price = price + (price * pourcent);
+                break;
+            case WALLS:
+                pourcent = config.getPourcentWallsCommand();
+                price = price + (price * pourcent);
+                break;
+            default:
+                break;
+        }
+        return price * quantity;
+    }
 
-		if (!this.haveWand(player)) {
-			Utils.sendMessage(player, "&cVous n'avez pas de bâton magique dans votre inventaire.");
-			return false;
-		}
+    public List<String> getAllowedBlocks() {
+        List<String> list = Lists.newArrayList();
+        for (Material mat : Material.values()) {
+            if (mat.isBlock() && !config.getIgnoredBlocks().contains(mat.name()))
+                list.add(mat.name());
+        }
+        return list;
+    }
 
-		return true;
-	}
+    public boolean goodCommand(CommandSender sender) {
+        if (!(sender instanceof Player)) {
+            Utils.sendMessage(sender, "&cLa commande ne peut-être exécuté qu'en jeu.");
+            return false;
+        }
 
-	public boolean isOnWE(Player player) {
-		return inWE.containsKey(player.getUniqueId());
-	}
+        Player player = (Player) sender;
 
-	public Cuboid getCuboid(Player player) {
-		Location loc1 = corners.get(player.getUniqueId())[0];
-		Location loc2 = corners.get(player.getUniqueId())[1];
-		if (loc1 == null || loc2 == null)
-			return null;
-		return new Cuboid(loc1, loc2);
-	}
+        if (!player.hasPermission("we.commands.cut")) {
+            Utils.sendMessage(player, "&cVous n'avez pas la permission de faire cela !");
+            return false;
+        }
 
-	public boolean positionsIsSameWorld(Player profile) {
-		Island island = SuperiorSkyblockAPI.getPlayer(profile.getName()).getIsland();
-		Location loc1 = corners.get(profile.getUniqueId())[0];
-		Location loc2 = corners.get(profile.getUniqueId())[1];
-		if (island == null || loc1 == null || loc2 == null)
-			return false;
-		return loc1.getWorld().equals(loc2.getWorld()) && island.isInsideRange(loc1) && island.isInsideRange(loc2);
-	}
+        Cuboid cuboid = this.getCuboid(player);
 
-	public void setupCorners(Player player) {
-		corners.put(player.getUniqueId(), new Location[] { null, null });
-	}
+        if (this.isOnWE(player)) {
+            Utils.sendMessage(player, "&cVous êtes déjà en train de faire une commande.");
+            return false;
+        }
 
-	public void eraseCorners(Player player) {
-		corners.remove(player.getUniqueId());
-	}
+        if (cuboid == null) {
+            Utils.sendMessage(player, "&cVos positions ne sont pas définies.");
+            return false;
+        }
 
-	public void applyWand(Player player, int use) {
-		if (InventoryUtils.isFullInventory(player)) {
-			player.getWorld().dropItem(player.getLocation(), wand.getWand(player, use));
-		} else {
-			InventoryUtils.addItem(player, wand.getWand(player, use));
-		}
-	}
+        if (!this.positionsIsSameWorld(player)) {
+            Utils.sendMessage(player, "&cVos positions ne sont pas dans le même monde.");
+            return false;
+        }
 
-	private void decrementWand(Player p) {
-		Inventory inv = p.getInventory();
-		for (int count = 0; count < inv.getSize(); count++) {
-			ItemStack i = inv.getItem(count);
-			if (isWand(i, p)) {
+        int count = this.haveWand(player);
+        if (count == 0) {
+            Utils.sendMessage(player, "&cVous n'avez pas de bâton magique dans votre inventaire.");
+            return false;
+        }
 
-				NBTItem compound = new NBTItem(i);
-				int uses = compound.getInteger("uses");
-				if (uses < 0) {
-					return;
-				}
-				uses -= 1;
-				compound.setInteger("uses", uses);
-				i = compound.getItem();
+        if (count > 1) {
+            Utils.sendMessage(player, "&cVous avez trop  de bâtons magiques dans votre inventaire.");
+            return false;
+        }
 
-				ItemMeta meta = i.getItemMeta();
-				List<String> lores = Lists.newArrayList();
+        return true;
+    }
 
-				for (String s : meta.getLore()) {
-					if (s.contains(config.getWordUses())) {
-						String[] tab = s.split(config.getSeparateUses());
-						String color = ChatColor.getLastColors(tab[1]);
-						Integer use = Ints.tryParse(ChatColor.stripColor(tab[1].replaceAll(" ", "")));
-						use -= 1;
+    public boolean isOnWE(Player player) {
+        return inWE.containsKey(player.getUniqueId());
+    }
 
-						String builder = tab[0] +
-								config.getSeparateUses() + " " +
-								color + use;
-						lores.add(builder);
-					} else {
-						lores.add(s);
-					}
+    public Cuboid getCuboid(Player player) {
+        Location loc1 = corners.get(player.getUniqueId())[0];
+        Location loc2 = corners.get(player.getUniqueId())[1];
+        if (loc1 == null || loc2 == null)
+            return null;
+        return new Cuboid(loc1, loc2);
+    }
 
-				}
-				meta.setLore(lores);
-				i.setItemMeta(meta);
-				p.getInventory().setItem(count, i);
-				if (uses == 0) {
-					InventoryUtils.decrementItem(p, i, InventoryUtils.getItemCount(p, i));
-				}
-				return;
-			}
-		}
-	}
+    public boolean positionsIsSameWorld(Player profile) {
+        Island island = SuperiorSkyblockAPI.getPlayer(profile.getName()).getIsland();
+        Location loc1 = corners.get(profile.getUniqueId())[0];
+        Location loc2 = corners.get(profile.getUniqueId())[1];
+        if (island == null || loc1 == null || loc2 == null)
+            return false;
+        return loc1.getWorld().equals(loc2.getWorld()) && island.isInsideRange(loc1) && island.isInsideRange(loc2);
+    }
 
-	public boolean isMember(Player player, Island island) {
-		for (SuperiorPlayer p : island.getIslandMembers(true)) {
-			if (p.getName().equals(player.getName())) {
-				return true;
-			}
-		}
-		return false;
-	}
+    public void setupCorners(Player player) {
+        corners.put(player.getUniqueId(), new Location[]{null, null});
+    }
 
-	public boolean haveWand(Player player) {
-		for (ItemStack i : player.getInventory().getContents()) {
-			if (isWand(i, player)) {
-				return true;
-			}
-		}
-		return false;
-	}
+    public void eraseCorners(Player player) {
+        corners.remove(player.getUniqueId());
+    }
 
-	public boolean isWand(ItemStack item, Player player) {
-		if (item == null || item.getType() == Material.AIR) {
-			return false;
-		}
+    public void applyWand(Player player, int use) {
+        if (InventoryUtils.isFullInventory(player)) {
+            player.getWorld().dropItem(player.getLocation(), wand.getWand(player, use));
+        } else {
+            InventoryUtils.addItem(player, wand.getWand(player, use));
+        }
+    }
 
-		NBTItem compound = new NBTItem(item);
-		if (!compound.hasKey("ownerName") || !compound.hasKey("set-wand") || !compound.hasKey("uses")) {
-			return false;
-		}
+    private void decrementWand(Player p) {
+        Inventory inv = p.getInventory();
+        for (int count = 0; count < inv.getSize(); count++) {
+            ItemStack i = inv.getItem(count);
+            if (isWand(i, p)) {
+                NBTItem compound = new NBTItem(i);
+                int uses = compound.getInteger("uses");
+                if (uses < 0) {
+                    return;
+                }
+                uses -= 1;
+                compound.setInteger("uses", uses);
+                i = compound.getItem();
 
-		return compound.getString("ownerName").equals(player.getName()) && compound.getBoolean("set-wand")
-				&& item.getType().name().equals(wand.getItem());
-	}
+                ItemMeta meta = i.getItemMeta();
+                List<String> lores = Lists.newArrayList();
 
-	public void addCorner(Player p, Location location, int pos) {
-		Location[] locs = new Location[2];
+                for (String s : meta.getLore()) {
+                    if (s.contains(config.getWordUses())) {
+                        String[] tab = s.split(config.getSeparateUses());
+                        String color = ChatColor.getLastColors(tab[1]);
+                        int use = Integer.parseInt(ChatColor.stripColor(tab[1].replaceAll(" ", "")));
+                        use -= 1;
 
-		if (pos == 0) {
-			locs[0] = location;
-			locs[1] = corners.get(p.getUniqueId())[1];
-		} else if (pos == 1) {
-			locs[1] = location;
-			locs[0] = corners.get(p.getUniqueId())[0];
-		}
+                        StringBuilder builder = new StringBuilder();
+                        builder.append(tab[0]);
+                        builder.append(config.getSeparateUses() + " ");
+                        builder.append(color + "" + use);
+                        lores.add(builder.toString());
+                    } else {
+                        lores.add(s);
+                    }
 
-		corners.put(p.getUniqueId(), locs);
-	}
+                }
+                meta.setLore(lores);
+                i.setItemMeta(meta);
+                p.getInventory().setItem(count, i);
+                if (uses == 0) {
+                    p.getInventory().setItem(count, new ItemStack(Material.AIR));
+                }
+                return;
+            }
+        }
+    }
 
-	@Override
-	public File getFile() {
-		return new File(IslandWorldEdit.getInstance().getDataFolder(), "config.json");
-	}
+    public boolean isMember(Player player, Island island) {
+        for (SuperiorPlayer p : island.getIslandMembers(true)) {
+            if (p.getName().equals(player.getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-	public File getWandFile() {
-		return new File(IslandWorldEdit.getInstance().getDataFolder(), "wand.json");
-	}
+    public int haveWand(Player player) {
+        int count = 0;
+        for (ItemStack i : player.getInventory().getContents()) {
+            if (isWand(i, player)) {
+                count++;
+                if(i.getAmount() > 1) {
+                    count += i.getAmount();
+                }
+            }
+        }
+        return count;
+    }
 
-	@Override
-	public void loadData() {
-		String content = DiscUtil.readCatch(this.getFile());
-		if (content != null) {
-			Type type = new TypeToken<Config>() {
-			}.getType();
-			this.config = IslandWorldEdit.getInstance().getGson().fromJson(content, type);
-		}
+    public boolean isWand(ItemStack item, Player player) {
+        if (item == null || item.getType() == Material.AIR) {
+            return false;
+        }
 
-		String content2 = DiscUtil.readCatch(this.getWandFile());
-		if (content2 != null) {
-			Type type = new TypeToken<Wand>() {
-			}.getType();
-			this.wand = IslandWorldEdit.getInstance().getGson().fromJson(content2, type);
-		}
-	}
+        NBTItem compound = new NBTItem(item);
+        if (!compound.hasKey("ownerName") || !compound.hasKey("set-wand") || !compound.hasKey("uses")) {
+            return false;
+        }
 
-	@Override
-	public void saveData() {
-		DiscUtil.writeCatch(this.getFile(), IslandWorldEdit.getInstance().getGson().toJson(config));
-		DiscUtil.writeCatch(this.getWandFile(), IslandWorldEdit.getInstance().getGson().toJson(wand));
-	}
+        return compound.getString("ownerName").equals(player.getName()) && compound.getBoolean("set-wand")
+                && item.getType().name().equals(wand.getItem());
+    }
 
-	public static WorldEditManager getSingleton() {
-		return singleton;
-	}
+    public void addCorner(Player p, Location location, int pos) {
+        Location[] locs = new Location[2];
 
-	public HashMap<UUID, Location[]> getCorners() {
-		return corners;
-	}
+        if (pos == 0) {
+            locs[0] = location;
+            locs[1] = corners.get(p.getUniqueId())[1];
+        } else if (pos == 1) {
+            locs[1] = location;
+            locs[0] = corners.get(p.getUniqueId())[0];
+        }
 
-	public Config getConfig() {
-		return config;
-	}
+        corners.put(p.getUniqueId(), locs);
+    }
 
-	public Wand getWand() {
-		return wand;
-	}
+    @Override
+    public File getFile() {
+        return new File(IslandWorldEdit.getInstance().getDataFolder(), "config.json");
+    }
 
-	public HashMap<UUID, BlockRunnable> getInWE() {
-		return inWE;
-	}
+    public File getWandFile() {
+        return new File(IslandWorldEdit.getInstance().getDataFolder(), "wand.json");
+    }
+
+    @Override
+    public void loadData() {
+        String content = DiscUtil.readCatch(this.getFile());
+        if (content != null) {
+            Type type = new TypeToken<Config>() {
+            }.getType();
+            this.config = IslandWorldEdit.getInstance().getGson().fromJson(content, type);
+        }
+
+        String content2 = DiscUtil.readCatch(this.getWandFile());
+        if (content2 != null) {
+            Type type = new TypeToken<Wand>() {
+            }.getType();
+            this.wand = IslandWorldEdit.getInstance().getGson().fromJson(content2, type);
+        }
+    }
+
+    @Override
+    public void saveData() {
+        DiscUtil.writeCatch(this.getFile(), IslandWorldEdit.getInstance().getGson().toJson(config));
+        DiscUtil.writeCatch(this.getWandFile(), IslandWorldEdit.getInstance().getGson().toJson(wand));
+    }
+
+    public HashMap<UUID, Location[]> getCorners() {
+        return corners;
+    }
+
+    public Config getConfig() {
+        return config;
+    }
+
+    public Wand getWand() {
+        return wand;
+    }
+
+    public HashMap<UUID, BlockRunnable> getInWE() {
+        return inWE;
+    }
 
 }

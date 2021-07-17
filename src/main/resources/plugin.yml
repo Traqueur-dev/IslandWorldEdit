@@ -28,5 +28,5 @@ commands:
     aliases: annuler
   count:
     aliases: calculer
-  worldedit:
-    aliases: we
+  stock:
+    aliases: [we,worldedit]

@@ -42,7 +42,6 @@ public class Wand {
 		nbtItem.setString("ownerName", player.getName());
 		nbtItem.setInteger("uses", use);
 		nbtItem.setBoolean("set-wand", true);
-		
 		return nbtItem.getItem();
 	}
 	
