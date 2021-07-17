@@ -82,6 +82,7 @@ public class InventoryUtils {
 		return left <= 0;
 	}
 
+
 	public static int getItemCount(Player player, ItemStack item) {
 		int quantityInInventory = 0;
 		PlayerInventory inventory = player.getInventory();

@@ -13,6 +13,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class Profile {
@@ -43,5 +44,23 @@ public class Profile {
 
     public void removeItem(GUItem guItem) {
         itemStock.removeIf(g -> g.getMaterial().name().equals(guItem.getMaterial().name()));
+    }
+
+    public void addItem(ItemStack item, int amount) {
+        GUItem guItem = itemStock.stream().filter(g -> g.getMaterial().name().equals(item.getType().name())).findFirst().orElse(null);
+        if(guItem == null) {
+            guItem = new GUItem(this, item.getType());
+            itemStock.add(guItem);
+        }
+        guItem.add(amount);
+
+    }
+
+    public boolean has(Material item) {
+        return itemStock.stream().anyMatch(g -> g.getMaterial().equals(item));
+    }
+
+    public GUItem get(Material m) {
+        return itemStock.stream().filter(g -> g.getMaterial().equals(m)).findFirst().orElse(null);
     }
 }

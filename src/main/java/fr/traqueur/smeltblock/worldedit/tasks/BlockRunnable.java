@@ -3,6 +3,8 @@ package fr.traqueur.smeltblock.worldedit.tasks;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import fr.traqueur.smeltblock.worldedit.managers.profiles.ProfileManager;
+import fr.traqueur.smeltblock.worldedit.managers.profiles.clazz.Profile;
 import fr.traqueur.smeltblock.worldedit.managers.worldedit.WorldEditManager;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -64,9 +66,14 @@ public abstract class BlockRunnable extends BukkitRunnable {
 		}
 	}
 	public void giveBlocks() {
+		Profile profile = ProfileManager.getSingleton().getProfile(player);
 		blockForSave.forEach((item,q) -> {
 			if(item != null && item.getType() != Material.AIR) {
-				InventoryUtils.addItem(player, item, q);
+				if(player.hasPermission("we.gui.use")) {
+					profile.addItem(item, q);
+				} else {
+					InventoryUtils.addItem(player, item, q);
+				}
 			}
 		});
 	}

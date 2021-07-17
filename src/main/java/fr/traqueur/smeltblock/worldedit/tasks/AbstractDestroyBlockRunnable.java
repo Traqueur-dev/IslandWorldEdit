@@ -30,7 +30,7 @@ public abstract class AbstractDestroyBlockRunnable extends BlockRunnable {
 			this.getBlocks().removeIf(b -> b.getType() == Material.AIR);
 		}
 
-		if(quantity > 2240) {
+		if(quantity > 2240 && !player.hasPermission("we.gui.use")) {
 			this.setQuantity(2240);
 		}
 		

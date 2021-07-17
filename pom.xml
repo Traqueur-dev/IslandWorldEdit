@@ -6,7 +6,7 @@
 
     <groupId>fr.traqueur.smeltblock</groupId>
     <artifactId>worldedit</artifactId>
-    <version>1.2</version>
+    <version>2.0.0</version>
     <packaging>jar</packaging>
 
     <name>IslandWorldEdit</name>
@@ -76,6 +76,10 @@
     </build>
 
     <repositories>
+        <repository>
+            <id>vault-repo</id>
+            <url>https://nexus.hc.to/content/repositories/pub_releases</url>
+        </repository>
         <repository>
             <id>codemc-repo</id>
             <url>https://repo.codemc.io/repository/maven-public/</url>
@@ -173,6 +177,7 @@
             <groupId>net.milkbowl.vault</groupId>
             <artifactId>VaultAPI</artifactId>
             <version>1.7</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>me.arcaniax</groupId>

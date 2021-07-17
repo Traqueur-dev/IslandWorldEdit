@@ -111,11 +111,15 @@ public class IslandWorldEdit extends JavaPlugin {
 		return ret;
 	}
 
-	private void setupEconomy() {
+	private boolean setupEconomy()
+	{
 		RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager()
-				.getRegistration(Economy.class);
-		if (economyProvider != null)
-			this.economy = economyProvider.getProvider();
+				.getRegistration(net.milkbowl.vault.economy.Economy.class);
+		if (economyProvider != null) {
+			economy = economyProvider.getProvider();
+		}
+
+		return (economy != null);
 	}
 
 	public void loadPersists() {

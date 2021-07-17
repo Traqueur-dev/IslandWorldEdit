@@ -35,6 +35,10 @@ public class ProfileManager implements JsonPersist {
         return profiles.stream().filter(pr -> pr.getName().equals(player.getName())).findFirst().orElse(null);
     }
 
+    public Profile getProfile(String player) {
+        return profiles.stream().filter(pr -> pr.getName().equals(player)).findFirst().orElse(null);
+    }
+
     public void createProfile(Player player) {
         Profile profile = new Profile(player);
         this.createProfile(profile);

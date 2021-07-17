@@ -17,18 +17,18 @@ import java.util.stream.Collectors;
 
 public class GUItem {
 
-    private Profile profile;
+    private String profile;
     private String material;
     private int amount;
 
     public GUItem(Profile profile, Material material, int amount) {
         this.material = material.name();
         this.amount = amount;
-        this.profile = profile;
+        this.profile = profile.getName();
     }
 
     public GUItem(Profile profile, Material material) {
-        this(profile, material, 1);
+        this(profile, material, 0);
     }
 
     public int retrieve(Player player, int quantity) {
@@ -71,6 +71,13 @@ public class GUItem {
         amount = amount + quantity;
     }
 
+    public void remove(int quantity) {
+        amount -= Math.min(amount, quantity);
+        if (amount <= 0) {
+            ProfileManager.getSingleton().getProfile(profile).removeItem(this);
+        }
+    }
+
     public ClickableItem toClickableItem(int page) {
         List<String> lore = WorldEditManager.getSingleton().getConfig().getLoreItems();
         lore = lore.stream().map(s -> s.replaceAll("%amount%", String.valueOf(amount))).collect(Collectors.toList());
@@ -107,7 +114,7 @@ public class GUItem {
                 }
             }
             player.sendMessage("§7Vous avez retiré §a" + quantity + " " + material);
-            WorldEditProvider.getInventory(player, profile).open(player, page);
+            WorldEditProvider.getInventory(player, ProfileManager.getSingleton().getProfile(profile)).open(player, page);
         });
 
         return cItem;

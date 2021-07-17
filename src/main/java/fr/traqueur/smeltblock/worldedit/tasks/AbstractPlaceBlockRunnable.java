@@ -2,6 +2,8 @@ package fr.traqueur.smeltblock.worldedit.tasks;
 
 import java.util.LinkedList;
 
+import fr.traqueur.smeltblock.worldedit.managers.profiles.ProfileManager;
+import fr.traqueur.smeltblock.worldedit.managers.profiles.clazz.Profile;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -20,6 +22,12 @@ public abstract class AbstractPlaceBlockRunnable extends BlockRunnable {
 		super(player, blocks, item);
 		this.replace = replace;
 		quantity = InventoryUtils.getItemCount(player, new ItemStack(item));
+		if(player.hasPermission("we.gui.use")) {
+			Profile profile = ProfileManager.getSingleton().getProfile(player);
+			if(profile.has(item)) {
+				quantity += profile.get(item).getAmount();
+			}
+		}
 		this.getExactVolume();
 	}
 	

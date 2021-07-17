@@ -2,6 +2,7 @@ package fr.traqueur.smeltblock.worldedit.tasks.replace;
 
 import java.util.LinkedList;
 
+import fr.traqueur.smeltblock.worldedit.managers.profiles.ProfileManager;
 import fr.traqueur.smeltblock.worldedit.managers.worldedit.WorldEditManager;
 import fr.traqueur.smeltblock.worldedit.managers.worldedit.clazz.TypeCommand;
 import fr.traqueur.smeltblock.worldedit.tasks.AbstractReplaceBlockRunnable;
@@ -50,7 +51,10 @@ public class ReplaceBlockToBlockRunnable extends AbstractReplaceBlockRunnable {
 				this.cancel();
 				return;
 			}
-			InventoryUtils.decrementItem(player, new ItemStack(this.getNewItem()), getQuantity());
+			int quantity = InventoryUtils.getItemCount(player, new ItemStack(this.getNewItem()));
+			InventoryUtils.decrementItem(player, new ItemStack(this.getNewItem()), quantity);
+			quantity = getQuantity() - quantity;
+			ProfileManager.getSingleton().getProfile(player).get(this.getNewItem()).remove(quantity);
 			EconomyUtils.withdraw(player.getName(), price);
 			payed = true;
 		}
@@ -59,7 +63,11 @@ public class ReplaceBlockToBlockRunnable extends AbstractReplaceBlockRunnable {
 			this.cancel();
 			this.giveBlocks();
 			int placed = this.getQuantity() - this.getBlocks().size();
-			InventoryUtils.addItem(player, new ItemStack(b.getType()), this.getBlocks().size());
+			if(player.hasPermission("we.gui.use")) {
+				ProfileManager.getSingleton().getProfile(player).addItem(new ItemStack(b.getType()), this.getBlocks().size());
+			} else {
+				InventoryUtils.addItem(player, new ItemStack(b.getType()), this.getBlocks().size());
+			}
 			player.sendMessage(manager.getConfig().getPrefix() + " §bVous §7avez placé §9x" + (placed) + " " + b.getType().toString() + "§7.");
 			manager.getInWE().remove(player.getUniqueId());
 			return;
