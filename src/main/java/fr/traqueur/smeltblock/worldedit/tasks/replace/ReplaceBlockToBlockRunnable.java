@@ -2,6 +2,7 @@ package fr.traqueur.smeltblock.worldedit.tasks.replace;
 
 import java.util.LinkedList;
 
+import fr.traqueur.smeltblock.worldedit.gui.clazz.GUItem;
 import fr.traqueur.smeltblock.worldedit.managers.profiles.ProfileManager;
 import fr.traqueur.smeltblock.worldedit.managers.worldedit.WorldEditManager;
 import fr.traqueur.smeltblock.worldedit.managers.worldedit.clazz.TypeCommand;
@@ -54,7 +55,10 @@ public class ReplaceBlockToBlockRunnable extends AbstractReplaceBlockRunnable {
 			int quantity = InventoryUtils.getItemCount(player, new ItemStack(this.getNewItem()));
 			InventoryUtils.decrementItem(player, new ItemStack(this.getNewItem()), quantity);
 			quantity = getQuantity() - quantity;
-			ProfileManager.getSingleton().getProfile(player).get(this.getNewItem()).remove(quantity);
+			GUItem guItem = ProfileManager.getSingleton().getProfile(player).get(this.getNewItem());
+			if(player.hasPermission("we.gui.use") && guItem != null) {
+				guItem.remove(quantity);
+			}
 			EconomyUtils.withdraw(player.getName(), price);
 			payed = true;
 		}

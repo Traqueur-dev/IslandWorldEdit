@@ -2,6 +2,7 @@ package fr.traqueur.smeltblock.worldedit.tasks.place;
 
 import fr.traqueur.smeltblock.worldedit.api.utils.EconomyUtils;
 import fr.traqueur.smeltblock.worldedit.api.utils.InventoryUtils;
+import fr.traqueur.smeltblock.worldedit.gui.clazz.GUItem;
 import fr.traqueur.smeltblock.worldedit.managers.profiles.ProfileManager;
 import fr.traqueur.smeltblock.worldedit.managers.worldedit.WorldEditManager;
 import fr.traqueur.smeltblock.worldedit.managers.worldedit.clazz.TypeCommand;
@@ -55,7 +56,10 @@ public class PlaceBlockToBlockRunnable extends AbstractPlaceBlockRunnable {
             int quantity = InventoryUtils.getItemCount(player, new ItemStack(item));
             InventoryUtils.decrementItem(player, new ItemStack(item), quantity);
             quantity = getQuantity() - quantity;
-            ProfileManager.getSingleton().getProfile(player).get(item).remove(quantity);
+            GUItem guItem = ProfileManager.getSingleton().getProfile(player).get(item);
+            if(player.hasPermission("we.gui.use") && guItem != null) {
+                guItem.remove(quantity);
+            }
             EconomyUtils.withdraw(player.getName(), price);
             payed = true;
         }
