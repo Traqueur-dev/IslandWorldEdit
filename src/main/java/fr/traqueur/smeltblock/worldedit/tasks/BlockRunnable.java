@@ -53,7 +53,10 @@ public abstract class BlockRunnable extends BukkitRunnable {
 			return true;
 		}
 		if(!island.isInsideRange(b.getLocation())) return true;
-		
+
+		if(b.getMetadata("PROCOSMETICS_BLOCK").isEmpty())
+			return true;
+
 		Config config = WorldEditManager.getSingleton().getConfig();
 		String name = b.getState().getData().getData() != 0 ? b.getType().name() + ":" + b.getState().getData().getData() : b.getType().name();
 		Material mat = Material.matchMaterial(name);
