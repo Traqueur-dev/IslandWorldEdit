@@ -53,12 +53,16 @@ public class PlaceBlockToBlockRunnable extends AbstractPlaceBlockRunnable {
                 return;
             }
 
-            int quantity = InventoryUtils.getItemCount(player, new ItemStack(item));
-            InventoryUtils.decrementItem(player, new ItemStack(item), quantity);
-            quantity = getQuantity() - quantity;
-            GUItem guItem = ProfileManager.getSingleton().getProfile(player).get(item);
-            if(player.hasPermission("we.gui.use") && guItem != null) {
-                guItem.remove(quantity);
+            int globalQuantity = getQuantity();
+            int quantityInInventory = InventoryUtils.getItemCount(player, new ItemStack(item));
+            int toRemoveInInv = Math.min(globalQuantity, quantityInInventory);
+            globalQuantity -= toRemoveInInv;
+            InventoryUtils.decrementItem(player, new ItemStack(item), toRemoveInInv);
+            if(globalQuantity > 0) {
+                GUItem guItem = ProfileManager.getSingleton().getProfile(player).get(item);
+                if(player.hasPermission("we.gui.use") && guItem != null) {
+                    guItem.remove(globalQuantity);
+                }
             }
             EconomyUtils.withdraw(player.getName(), price);
             payed = true;

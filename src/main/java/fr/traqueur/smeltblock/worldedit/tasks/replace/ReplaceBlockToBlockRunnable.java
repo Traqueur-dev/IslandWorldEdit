@@ -52,12 +52,16 @@ public class ReplaceBlockToBlockRunnable extends AbstractReplaceBlockRunnable {
 				this.cancel();
 				return;
 			}
-			int quantity = InventoryUtils.getItemCount(player, new ItemStack(this.getNewItem()));
-			InventoryUtils.decrementItem(player, new ItemStack(this.getNewItem()), quantity);
-			quantity = getQuantity() - quantity;
-			GUItem guItem = ProfileManager.getSingleton().getProfile(player).get(this.getNewItem());
-			if(player.hasPermission("we.gui.use") && guItem != null) {
-				guItem.remove(quantity);
+			int globalQuantity = getQuantity();
+			int quantityInInventory = InventoryUtils.getItemCount(player, new ItemStack(this.getNewItem()));
+			int toRemoveInInv = Math.min(globalQuantity, quantityInInventory);
+			globalQuantity -= toRemoveInInv;
+			InventoryUtils.decrementItem(player, new ItemStack(this.getNewItem()), toRemoveInInv);
+			if(globalQuantity > 0) {
+				GUItem guItem = ProfileManager.getSingleton().getProfile(player).get(this.getNewItem());
+				if(player.hasPermission("we.gui.use") && guItem != null) {
+					guItem.remove(globalQuantity);
+				}
 			}
 			EconomyUtils.withdraw(player.getName(), price);
 			payed = true;

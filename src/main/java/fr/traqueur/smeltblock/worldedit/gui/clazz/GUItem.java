@@ -6,6 +6,7 @@ import fr.traqueur.smeltblock.worldedit.gui.WorldEditProvider;
 import fr.traqueur.smeltblock.worldedit.managers.profiles.ProfileManager;
 import fr.traqueur.smeltblock.worldedit.managers.profiles.clazz.Profile;
 import fr.traqueur.smeltblock.worldedit.managers.worldedit.WorldEditManager;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;

@@ -38,6 +38,7 @@ public abstract class BlockRunnable extends BukkitRunnable {
 		this.item = item;
 		this.cancel = false;
 		this.blockForSave = Maps.newHashMap();
+		ProfileManager.getSingleton().getProfile(player).init();
 	}
 	
 	public abstract void getExactVolume();
@@ -48,6 +49,9 @@ public abstract class BlockRunnable extends BukkitRunnable {
 		if(cube != null || mobcube != null) return true;
 		
 		Island island = SuperiorSkyblockAPI.getPlayer(player).getIsland();
+		if(island == null) {
+			return true;
+		}
 		if(!island.isInsideRange(b.getLocation())) return true;
 		
 		Config config = WorldEditManager.getSingleton().getConfig();
@@ -57,13 +61,13 @@ public abstract class BlockRunnable extends BukkitRunnable {
 	}
 	
 	public void saveBlock(Block b) {
-		
 		ItemStack toSave = new ItemStack(b.getType());
 		if(blockForSave.containsKey(toSave)) {
 			blockForSave.put(toSave, blockForSave.get(toSave)+1);
 		} else {
 			blockForSave.put(toSave, 1);
 		}
+		ProfileManager.getSingleton().getProfile(player).save(b);
 	}
 	public void giveBlocks() {
 		Profile profile = ProfileManager.getSingleton().getProfile(player);

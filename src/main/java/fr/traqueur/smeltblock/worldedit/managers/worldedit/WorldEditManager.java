@@ -235,6 +235,10 @@ public class WorldEditManager implements JsonPersist {
                 pourcent = config.getPourcentCylCommand();
                 price = price + (price * pourcent);
                 break;
+            case SPHERE:
+                pourcent = config.getPourcentSphereCommand();
+                price = price + (price * pourcent);
+                break;
             case REPLACE:
                 pourcent = config.getPourcentReplaceCommand();
                 price = price + (price * pourcent);
@@ -243,6 +247,9 @@ public class WorldEditManager implements JsonPersist {
                 pourcent = config.getPourcentWallsCommand();
                 price = price + (price * pourcent);
                 break;
+            case UNDO:
+                pourcent = config.getPourcentUndoCommand();
+                price = config.getPriceUndo() + (config.getPriceUndo() * pourcent);
             default:
                 break;
         }
@@ -258,7 +265,7 @@ public class WorldEditManager implements JsonPersist {
         return list;
     }
 
-    public boolean goodCommand(CommandSender sender) {
+    public boolean goodCommand(CommandSender sender, String perm) {
         if (!(sender instanceof Player)) {
             Utils.sendMessage(sender, "&cLa commande ne peut-être exécuté qu'en jeu.");
             return false;
@@ -266,7 +273,7 @@ public class WorldEditManager implements JsonPersist {
 
         Player player = (Player) sender;
 
-        if (!player.hasPermission("we.commands.cut")) {
+        if (!player.hasPermission(perm)) {
             Utils.sendMessage(player, "&cVous n'avez pas la permission de faire cela !");
             return false;
         }

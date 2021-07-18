@@ -23,7 +23,7 @@ public class FillCommand implements CommandExecutor, TabCompleter {
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		WorldEditManager manager = WorldEditManager.getSingleton();
 
-		if (!manager.goodCommand(sender)) {
+		if (!manager.goodCommand(sender, "we.commands.fill")) {
 			return false;
 		}
 

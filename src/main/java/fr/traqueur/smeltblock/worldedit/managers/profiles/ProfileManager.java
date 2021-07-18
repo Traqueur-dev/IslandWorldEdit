@@ -48,6 +48,7 @@ public class ProfileManager implements JsonPersist {
         if(!this.exist(profile)) {
             profiles.add(profile);
         }
+        profile.init();
     }
 
     @Override

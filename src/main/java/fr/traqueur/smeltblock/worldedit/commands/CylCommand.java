@@ -25,7 +25,7 @@ public class CylCommand implements CommandExecutor, TabCompleter {
 		WorldEditManager manager = WorldEditManager.getSingleton();
 		
 		
-		if (!manager.goodCommand(sender)) {
+		if (!manager.goodCommand(sender, "we.commands.cyl")) {
 			return false;
 		}
 		

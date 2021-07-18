@@ -24,7 +24,7 @@ public class SphereCommand implements CommandExecutor, TabCompleter {
 		WorldEditManager manager = WorldEditManager.getSingleton();
 		
 		
-		if (!manager.goodCommand(sender)) {
+		if (!manager.goodCommand(sender,"we.commands.sphere")) {
 			return false;
 		}
 		

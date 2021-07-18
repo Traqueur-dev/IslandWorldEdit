@@ -16,6 +16,7 @@ public class Config {
     private List<String> loreInventory;
     private List<String> loreItems;
     private double defaultPrice;
+    private double priceUndo;
     private HashMap<String, Double> priceBlocks;
     private List<String> ignoredBlocks;
     private double pourcentSetCommand;
@@ -24,6 +25,9 @@ public class Config {
     private double pourcentFillCommand;
     private double pourcentReplaceCommand;
     private double pourcentCylCommand;
+    private double pourcentUndoCommand;
+    private double pourcentSphereCommand;
+
 
     public Config() {
         this.prefix = "§7(§9PlayerWorldEdit§7)";
@@ -53,7 +57,10 @@ public class Config {
         pourcentFillCommand = 0;
         pourcentReplaceCommand = 0;
         pourcentCylCommand = 0;
+        pourcentSphereCommand = 0;
+        pourcentUndoCommand = 10;
         defaultPrice = 10;
+        priceUndo = 15;
 
         priceBlocks.put(Material.DIAMOND_BLOCK.name(), 20d);
 
@@ -187,5 +194,17 @@ public class Config {
 
     public void setLoreItems(List<String> loreItems) {
         this.loreItems = loreItems;
+    }
+
+    public double getPourcentSphereCommand() {
+        return this.pourcentSphereCommand;
+    }
+
+    public double getPourcentUndoCommand() {
+        return pourcentUndoCommand;
+    }
+
+    public double getPriceUndo() {
+        return this.priceUndo;
     }
 }

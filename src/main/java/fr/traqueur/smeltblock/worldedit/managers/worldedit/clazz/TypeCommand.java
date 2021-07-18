@@ -9,4 +9,5 @@ public enum TypeCommand {
 	WALLS,
 	CYL,
 	SPHERE,
+	UNDO,
 }

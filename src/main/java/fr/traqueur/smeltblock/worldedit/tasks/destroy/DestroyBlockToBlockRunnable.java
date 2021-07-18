@@ -70,7 +70,6 @@ public class DestroyBlockToBlockRunnable extends AbstractDestroyBlockRunnable {
 			}
 		} else {
 			this.saveBlock(b);
-			b.setType(Material.AIR);
 			manager.setBlockInNativeWorld(b.getLocation(), Material.AIR.createBlockData(), false);
 			this.getBlocks().removeFirst();	
 		}
@@ -81,7 +80,6 @@ public class DestroyBlockToBlockRunnable extends AbstractDestroyBlockRunnable {
 			player.sendMessage(manager.getConfig().getPrefix() + " §bVous §7avez cassé §9x" + (placed) + " blocs§7.");
 			manager.getInWE().remove(player.getUniqueId());
 			this.cancel();
-			return;
 		}
 	}
 }
