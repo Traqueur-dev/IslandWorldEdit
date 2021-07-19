@@ -40,7 +40,7 @@ public class BlockLocation {
 
         }
 
-        WorldEditManager.getSingleton().setBlockInNativeWorld(getLocation(), getMaterial().createBlockData(), false);
+        WorldEditManager.getSingleton().setBlockInNativeWorld(Bukkit.getPlayer(profile.getName()), getLocation(), getMaterial().createBlockData(), false);
         block.setBlockData(data);
 
         if (getMaterial() != Material.AIR) {

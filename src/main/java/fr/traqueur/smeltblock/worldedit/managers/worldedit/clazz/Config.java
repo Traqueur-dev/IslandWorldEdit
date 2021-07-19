@@ -3,18 +3,22 @@ package fr.traqueur.smeltblock.worldedit.managers.worldedit.clazz;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 
 import java.util.HashMap;
 import java.util.List;
 
 public class Config {
 
+    private String particle;
     private String prefix;
     private String separateUses;
     private String wordUses;
     private String guiName;
+    private String guiAddItemsName;
     private List<String> loreInventory;
     private List<String> loreItems;
+    private List<String> loreAddItems;
     private double defaultPrice;
     private double priceUndo;
     private HashMap<String, Double> priceBlocks;
@@ -30,11 +34,14 @@ public class Config {
 
 
     public Config() {
+        this.particle = Particle.VILLAGER_HAPPY.name();
         this.prefix = "§7(§9PlayerWorldEdit§7)";
         this.separateUses = ":";
         this.wordUses = "Utilisations";
         this.guiName = "Stockage WorldEdit";
+        this.guiAddItemsName = "Ajout d'Items";
         this.loreInventory = Lists.newArrayList("Lore 1", "Lore 2", "Lore 3");
+        this.loreAddItems = Lists.newArrayList("Lore un", "Lore deux");
         this.loreItems = Lists.newArrayList();
         loreItems.add("§7┌             §f──────");
         loreItems.add("§7│ §f『§6§lUtilité§f』");
@@ -206,5 +213,17 @@ public class Config {
 
     public double getPriceUndo() {
         return this.priceUndo;
+    }
+
+    public Particle getParticle() {
+        return Particle.valueOf(this.particle);
+    }
+
+    public List<String> getLoreAddItems() {
+        return this.loreAddItems;
+    }
+
+    public String getGuiAddItemsName() {
+        return guiAddItemsName;
     }
 }

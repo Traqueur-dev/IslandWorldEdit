@@ -26,6 +26,8 @@ import org.bukkit.Location;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import xzot1k.plugins.ds.DisplayShops;
+import xzot1k.plugins.ds.DisplayShopsAPI;
 
 import java.lang.reflect.Modifier;
 import java.util.List;
@@ -35,6 +37,7 @@ public class IslandWorldEdit extends JavaPlugin {
 
 	private static IslandWorldEdit instance;
 	private static InventoryManager invManager;
+	private static DisplayShopsAPI displayShopsAPI;
 
 	private Gson gson;
 	private Economy economy;
@@ -57,6 +60,7 @@ public class IslandWorldEdit extends JavaPlugin {
 		this.persists.add(new ProfileManager());
 
 		this.setupEconomy();
+		this.isDisplayShopsInstalled();
 
 		invManager = new InventoryManager(this);
 		invManager.init();
@@ -122,6 +126,19 @@ public class IslandWorldEdit extends JavaPlugin {
 		return (economy != null);
 	}
 
+	private boolean isDisplayShopsInstalled()
+	{
+		DisplayShops ds = (DisplayShops) getServer().getPluginManager().getPlugin("DisplayShops");
+
+		if(ds != null)
+		{
+			displayShopsAPI = ds;
+			return true;
+		}
+
+		return false;
+	}
+
 	public void loadPersists() {
 		List<JsonPersist> jsonPersists = this.persists;
 		for (JsonPersist jsonPersist : jsonPersists) {
@@ -160,4 +177,7 @@ public class IslandWorldEdit extends JavaPlugin {
 
 	public static InventoryManager manager() { return invManager; }
 
+	public static DisplayShopsAPI getDisplayShopsAPI() {
+		return displayShopsAPI;
+	}
 }

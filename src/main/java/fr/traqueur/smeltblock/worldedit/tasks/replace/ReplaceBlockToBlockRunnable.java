@@ -76,7 +76,8 @@ public class ReplaceBlockToBlockRunnable extends AbstractReplaceBlockRunnable {
 			} else {
 				InventoryUtils.addItem(player, new ItemStack(b.getType()), this.getBlocks().size());
 			}
-			player.sendMessage(manager.getConfig().getPrefix() + " §bVous §7avez placé §9x" + (placed) + " " + b.getType().toString() + "§7.");
+			player.sendMessage(manager.getConfig().getPrefix() + " §bVous §7avez placé §9x" + (placed) + " " + b.getType().toString() + "§7 pour §9"
+					+ price + "⛁ §7.");
 			manager.getInWE().remove(player.getUniqueId());
 			return;
 		}
@@ -85,13 +86,14 @@ public class ReplaceBlockToBlockRunnable extends AbstractReplaceBlockRunnable {
 		//b.getType() == this.getItem().parseMaterial() && b.getData() == this.getItem().getData()
 		if(b.getBlockData().equals(this.getItem().createBlockData())) {
 			this.saveBlock(b);
-			manager.setBlockInNativeWorld(b.getLocation(), this.getNewItem().createBlockData(), false);
+			manager.setBlockInNativeWorld(player, b.getLocation(), this.getNewItem().createBlockData(), false);
 			this.getBlocks().removeFirst();
 		}
 		
 		if(blocks.size() == 0) {
 			this.giveBlocks();
-			player.sendMessage(manager.getConfig().getPrefix() + " §bVous §7avez placé §9x" + (this.getQuantity()) + " " + item + "§7.");
+			player.sendMessage(manager.getConfig().getPrefix() + " §bVous §7avez placé §9x" + (this.getQuantity()) + " " + item + "§7 pour §9"
+					+ price + "⛁ §7.");
 			manager.getInWE().remove(player.getUniqueId());
 			this.cancel();
 			return;

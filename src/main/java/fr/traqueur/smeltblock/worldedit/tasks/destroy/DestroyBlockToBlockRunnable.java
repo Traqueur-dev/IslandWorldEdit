@@ -56,7 +56,8 @@ public class DestroyBlockToBlockRunnable extends AbstractDestroyBlockRunnable {
 			this.cancel();
 			this.giveBlocks();
 			int placed = this.getQuantity() - this.getBlocks().size();
-			player.sendMessage(manager.getConfig().getPrefix() + " §bVous §7avez cassé §9x" + (placed) + " blocs§7.");
+			player.sendMessage(manager.getConfig().getPrefix() + " §bVous §7avez cassé §9x" + (placed) + " blocs§7 pour §9"
+					+ price + "⛁ §7.");
 			manager.getInWE().remove(player.getUniqueId());
 			return;
 		}
@@ -65,19 +66,20 @@ public class DestroyBlockToBlockRunnable extends AbstractDestroyBlockRunnable {
 		if(item != null) {
 			if(item == b.getType()) {
 				this.saveBlock(b);
-				manager.setBlockInNativeWorld(b.getLocation(), Material.AIR.createBlockData(), false);
+				manager.setBlockInNativeWorld(player, b.getLocation(), Material.AIR.createBlockData(), false);
 				this.getBlocks().removeFirst();
 			}
 		} else {
 			this.saveBlock(b);
-			manager.setBlockInNativeWorld(b.getLocation(), Material.AIR.createBlockData(), false);
+			manager.setBlockInNativeWorld(player, b.getLocation(), Material.AIR.createBlockData(), false);
 			this.getBlocks().removeFirst();	
 		}
 		
 		if(blocks.size() == 0) {
 			this.giveBlocks();
 			int placed = this.getQuantity() - this.getBlocks().size();
-			player.sendMessage(manager.getConfig().getPrefix() + " §bVous §7avez cassé §9x" + (placed) + " blocs§7.");
+			player.sendMessage(manager.getConfig().getPrefix() + " §bVous §7avez cassé §9x" + (placed) + " blocs§7 pour §9"
+					+ price + "⛁ §7.");
 			manager.getInWE().remove(player.getUniqueId());
 			this.cancel();
 		}

@@ -44,11 +44,20 @@ public class UndoRunnable extends BukkitRunnable {
             payed = true;
         }
 
+        if (undo.size() == 0) {
+            Utils.sendMessage(player, "&bVous &7avez &9revoqué &7votre dernière action pour §9"
+                    + price + "⛁ §&7.");
+            this.cancel();
+            return;
+        }
+
         BlockLocation b = undo.getFirst();
         b.undo(profile);
         undo.removeFirst();
 
         if (undo.size() == 0) {
+            Utils.sendMessage(player, "&bVous &7avez &9revoqué &7votre dernière action pour §9"
+                    + price + "⛁ &7.");
             this.cancel();
         }
     }

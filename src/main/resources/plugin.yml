@@ -3,7 +3,7 @@ version: ${project.version}
 main: fr.traqueur.smeltblock.worldedit.IslandWorldEdit
 api-version: 1.16
 prefix: IslandWorldEdit
-depend: [ Vault, SuperiorSkyblock2, GenCubes, IslandMobCubes, QuestCreator, Jobs ]
+depend: [ Vault, SuperiorSkyblock2, GenCubes, IslandMobCubes, QuestCreator, Jobs, DisplayShops]
 authors: [ Traqueur_ ]
 description: Plugin like WorldEdit but player paid and block is not limitless
 commands:

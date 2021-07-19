@@ -78,7 +78,8 @@ public class PlaceBlockToBlockRunnable extends AbstractPlaceBlockRunnable {
                 InventoryUtils.addItem(player, new ItemStack(item), this.getBlocks().size());
             }
 
-            player.sendMessage(manager.getConfig().getPrefix() + " §bVous §7avez placé §9x" + (placed) + " " + item + "§7.");
+            player.sendMessage(manager.getConfig().getPrefix() + " §bVous §7avez placé §9x" + (placed) + " " + item + "§7 pour §9"
+                    + price + "⛁ §7.");
             manager.getInWE().remove(player.getUniqueId());
             return;
         }
@@ -86,12 +87,13 @@ public class PlaceBlockToBlockRunnable extends AbstractPlaceBlockRunnable {
         b = this.getBlocks().getFirst();
         this.saveBlock(b);
 
-        manager.setBlockInNativeWorld(b.getLocation(), this.getItem().createBlockData(), false);
+        manager.setBlockInNativeWorld(player, b.getLocation(), this.getItem().createBlockData(), false);
         this.getBlocks().removeFirst();
 
         if (blocks.size() == 0) {
             this.giveBlocks();
-            player.sendMessage(manager.getConfig().getPrefix() + " §bVous §7avez placé §9x" + (this.getQuantity()) + " " + item + "§7.");
+            player.sendMessage(manager.getConfig().getPrefix() + " §bVous §7avez placé §9x" + (this.getQuantity()) + " " + item + "§7 pour §9"
+                    + price + "⛁ §7.");
             manager.getInWE().remove(player.getUniqueId());
             this.cancel();
             return;

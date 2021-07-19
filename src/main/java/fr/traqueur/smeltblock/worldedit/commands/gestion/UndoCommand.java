@@ -39,7 +39,6 @@ public class UndoCommand implements CommandExecutor {
 				.runTaskTimer(IslandWorldEdit.getInstance(), 0, 1);
 
         profile.init();
-        Utils.sendMessage(player, "&bVous &7avez &9revoqué &7votre dernière action.");
         return true;
     }
 

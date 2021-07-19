@@ -16,6 +16,7 @@ import me.arcaniax.hdb.api.HeadDatabaseAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -35,16 +36,13 @@ public class WorldEditProvider implements InventoryProvider {
     private Profile profile;
 
     public static SmartInventory getInventory(Player player, Profile profile) {
-        if(INVENTORY == null) {
-            INVENTORY = SmartInventory.builder()
-                    .provider(new WorldEditProvider(player, profile))
-                    .id(profile.getName() + "'s worldedit stock")
-                    .closeable(true)
-                    .title(WorldEditManager.getSingleton().getConfig().getGuiName())
-                    .size(6,9)
-                    .build();
-        }
-
+        INVENTORY = SmartInventory.builder()
+                .provider(new WorldEditProvider(player, profile))
+                .id(profile.getName() + "'s worldedit stock")
+                .closeable(true)
+                .title(WorldEditManager.getSingleton().getConfig().getGuiName())
+                .size(6,9)
+                .build();
         return INVENTORY;
     }
 
@@ -62,15 +60,23 @@ public class WorldEditProvider implements InventoryProvider {
     }
 
     private void setupDecorativeContent(InventoryContents contents, Pagination pagination) {
-        int page = pagination.getPage();
+        ItemStack item;
+        ItemMeta itemM;
 
-        contents.set(0,0, ClickableItem.empty(new ItemBuilder(Material.LIGHT_BLUE_STAINED_GLASS_PANE).displayname("§1")
-                .addFlags(ItemFlag.HIDE_ATTRIBUTES).build()));
+        item = headApi.getItemHead("11230");
+        itemM = item.getItemMeta();
+        itemM.setDisplayName("§7Ajouter des blocks");
+        itemM.setLore(config.getLoreAddItems());
+        item.setItemMeta(itemM);
+
+        contents.set(0,0, ClickableItem.of(item, event -> {
+            Inventory inv = Bukkit.createInventory(player, 54, config.getGuiAddItemsName());
+            player.openInventory(inv);
+        }));
 
         addBlueGlassPane(contents,0, 1);
         addBlueGlassPane(contents,0, 7);
-        ItemStack item;
-        ItemMeta itemM;
+
         item = headApi.getItemHead("5650");
         itemM = item.getItemMeta();
         itemM.setDisplayName("§7Informations");

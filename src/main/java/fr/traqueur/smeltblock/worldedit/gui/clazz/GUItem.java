@@ -45,7 +45,8 @@ public class GUItem {
         amount = amount - available;
 
         if (amount <= 0) {
-
+            ProfileManager.getSingleton().getProfile(player).removeItem(this);
+            return 0;
         }
 
         return available;
@@ -113,6 +114,9 @@ public class GUItem {
                     player.sendMessage("§c✘ Vous n'avez pas assez de place dans l'inventaire pour retirer §6x" + quantity + " " + material + "§c ✘");
                     return;
                 }
+            }
+            if (amount <= 0) {
+                ProfileManager.getSingleton().getProfile(player).removeItem(this);
             }
             player.sendMessage("§7Vous avez retiré §a" + quantity + " " + material);
             WorldEditProvider.getInventory(player, ProfileManager.getSingleton().getProfile(profile)).open(player, page);

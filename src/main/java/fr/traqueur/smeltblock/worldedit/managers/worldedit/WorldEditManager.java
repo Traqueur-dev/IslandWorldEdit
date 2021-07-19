@@ -25,10 +25,7 @@ import fr.traqueur.smeltblock.worldedit.tasks.place.PlaceBlockToBlockRunnable;
 import fr.traqueur.smeltblock.worldedit.tasks.replace.ReplaceBlockToBlockRunnable;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.IBlockData;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.command.CommandSender;
@@ -66,12 +63,13 @@ public class WorldEditManager implements JsonPersist {
         return singleton;
     }
 
-    public void setBlockInNativeWorld(Location loc, BlockData blockData, boolean applyPhysics) {
+    public void setBlockInNativeWorld(Player player, Location loc, BlockData blockData, boolean applyPhysics) {
         net.minecraft.server.v1_16_R3.World nmsWorld = ((CraftWorld) loc.getWorld()).getHandle();
         IBlockData data = ((CraftBlockData) blockData).getState();
         nmsWorld.setTypeAndData(new BlockPosition(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()), data, applyPhysics ? 3 : 2);
         loc.getBlock().setMetadata("worldEdited", new FixedMetadataValue(IslandWorldEdit.getInstance(), true));
         BoardLocalQC.inst().setPlacedByPlayer(loc.getBlock());
+        player.spawnParticle(config.getParticle(), loc, 10, 0.5,0.5,0.5);
     }
 
     public int getAmount(Player p, Material m) {
