@@ -11,6 +11,7 @@ import fr.traqueur.smeltblock.worldedit.managers.profiles.ProfileManager;
 import fr.traqueur.smeltblock.worldedit.managers.profiles.clazz.Profile;
 import fr.traqueur.smeltblock.worldedit.managers.worldedit.WorldEditManager;
 import fr.traqueur.smeltblock.worldedit.managers.worldedit.clazz.Config;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -65,9 +66,9 @@ public abstract class BlockRunnable extends BukkitRunnable {
         }
 
         Config config = WorldEditManager.getSingleton().getConfig();
-        String name = b.getState().getData().getData() != 0 ? b.getType().name() + ":" + b.getState().getData().getData() : b.getType().name();
-        Material mat = Material.matchMaterial(name);
-        return mat != null && config.getIgnoredBlocks().contains(mat.name());
+        Material mat = b.getType();
+        Bukkit.broadcastMessage(mat.name());
+        return config.getIgnoredBlocks().contains(mat.name());
     }
 
     public void saveBlock(Block b) {
