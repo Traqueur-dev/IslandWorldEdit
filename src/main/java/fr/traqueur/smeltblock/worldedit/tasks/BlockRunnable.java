@@ -67,7 +67,6 @@ public abstract class BlockRunnable extends BukkitRunnable {
 
         Config config = WorldEditManager.getSingleton().getConfig();
         Material mat = b.getType();
-        Bukkit.broadcastMessage(mat.name());
         return config.getIgnoredBlocks().contains(mat.name());
     }
 
