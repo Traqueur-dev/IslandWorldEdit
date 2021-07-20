@@ -31,10 +31,6 @@ public class PlaceBlockToBlockRunnable extends AbstractPlaceBlockRunnable {
         payed = false;
         price = manager.getPrice(item, getQuantity(), command);
 
-        player.sendMessage("quantity: " + getQuantity());
-        player.sendMessage("size :" + size);
-        player.sendMessage("limit: " + manager.getConfig().getQuantityLimit());
-
         if (size >= manager.getConfig().getQuantityLimit() && manager.getConfig().getQuantityLimit() != -1) {
             player.sendMessage(manager.getConfig().getPrefix() + " §cLa zone sélectionée est trop grande.");
             manager.getInWE().remove(player.getUniqueId());
