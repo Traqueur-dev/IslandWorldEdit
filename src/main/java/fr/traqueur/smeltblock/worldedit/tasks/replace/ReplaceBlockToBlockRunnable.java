@@ -22,15 +22,20 @@ public class ReplaceBlockToBlockRunnable extends AbstractReplaceBlockRunnable {
 	private boolean payed;
 	private Block b;
 	
-	public ReplaceBlockToBlockRunnable(Player player, LinkedList<Block> blocks, Material item, TypeCommand command, Material newItem) {
+	public ReplaceBlockToBlockRunnable(Player player, LinkedList<Block> blocks,int size, Material item, TypeCommand command, Material newItem) {
 		super(player, blocks, item, newItem);
 		this.manager = WorldEditManager.getSingleton();
 		payed = false;
 		price = manager.getPrice(item, getQuantity(), command);
-		if(getQuantity() >= manager.getConfig().getQuantityLimit() && manager.getConfig().getQuantityLimit() != -1) {
+
+		if(size >= manager.getConfig().getQuantityLimit() && manager.getConfig().getQuantityLimit() != -1) {
 			player.sendMessage(manager.getConfig().getPrefix() + " §cLa zone sélectionée est trop grande.");
 			manager.getInWE().remove(player.getUniqueId());
 			this.setCancel(true);
+		}
+
+		if(getQuantity() < size) {
+			this.getBlocks().subList(getQuantity(), size).clear();
 		}
 	}
 
@@ -78,6 +83,9 @@ public class ReplaceBlockToBlockRunnable extends AbstractReplaceBlockRunnable {
 		//b.getType() == this.getItem().parseMaterial() && b.getData() == this.getItem().getData()
 		if(b.getBlockData().equals(this.getItem().createBlockData())) {
 			this.saveBlock(b);
+			if(!b.getChunk().isLoaded()) {
+				b.getChunk().load();
+			}
 			manager.setBlockInNativeWorld(player, b.getLocation(), this.getNewItem().createBlockData(), false);
 			this.getBlocks().removeFirst();
 		}

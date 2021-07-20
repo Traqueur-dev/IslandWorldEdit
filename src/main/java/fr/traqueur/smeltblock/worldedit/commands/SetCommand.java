@@ -1,6 +1,7 @@
 package fr.traqueur.smeltblock.worldedit.commands;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import fr.traqueur.smeltblock.worldedit.api.utils.Cuboid;
@@ -46,7 +47,13 @@ public class SetCommand implements CommandExecutor, TabCompleter {
 			return false;
 		}
 
-		manager.setBlock((Player) sender, cuboid.getBlocks(), material, true, TypeCommand.SET);
+		if(cuboid.getVolume() >= manager.getConfig().getQuantityLimit() && manager.getConfig().getQuantityLimit() != -1) {
+			sender.sendMessage(manager.getConfig().getPrefix() + " §cLa zone sélectionée est trop grande.");
+			manager.getInWE().remove(((Player) sender).getUniqueId());
+			return true;
+		}
+
+		manager.setBlock((Player) sender, cuboid.getBlocks(), cuboid.getVolume(), material, true, TypeCommand.SET);
 
 		return true;
 	}
@@ -59,10 +66,10 @@ public class SetCommand implements CommandExecutor, TabCompleter {
 
 		if (args.length == 1) {
 			return WorldEditManager.getSingleton().getAllowedBlocks().stream()
-					.filter(s -> s.toLowerCase().startsWith(args[0].toLowerCase())).collect(Collectors.toList());
+					.map(String::toLowerCase).filter(s -> s.startsWith(args[0].toLowerCase())).collect(Collectors.toList());
 		}
 
-		return WorldEditManager.getSingleton().getAllowedBlocks();
+		return WorldEditManager.getSingleton().getAllowedBlocks().stream().map(String::toLowerCase).collect(Collectors.toList());
 	}
 
 }

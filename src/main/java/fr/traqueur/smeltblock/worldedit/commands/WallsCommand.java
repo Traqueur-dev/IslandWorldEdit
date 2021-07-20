@@ -3,6 +3,8 @@ package fr.traqueur.smeltblock.worldedit.commands;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import fr.traqueur.smeltblock.worldedit.api.utils.Cuboid;
+import fr.traqueur.smeltblock.worldedit.exceptions.TooManyBlocksException;
 import fr.traqueur.smeltblock.worldedit.managers.worldedit.WorldEditManager;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -42,8 +44,12 @@ public class WallsCommand implements CommandExecutor, TabCompleter {
 			Utils.sendMessage(sender, "&cVous n'avez pas ce bloc dans votre inventaire.");
 			return false;
 		}
-		
-		manager.setDifferentCuboid((Player) sender, manager.getWalls((Player) sender), material, TypeCommand.WALLS);
+
+		try {
+			manager.setDifferentCuboid((Player) sender, manager.getWalls((Player) sender), material, TypeCommand.WALLS);
+		} catch (TooManyBlocksException e) {
+			return true;
+		}
 		return true;
 	}
 
@@ -55,9 +61,9 @@ public class WallsCommand implements CommandExecutor, TabCompleter {
 	
 		if (args.length == 1) {
 			return WorldEditManager.getSingleton().getAllowedBlocks().stream()
-					.filter(s -> s.toLowerCase().startsWith(args[0].toLowerCase())).collect(Collectors.toList());
+					.map(String::toLowerCase).filter(s -> s.startsWith(args[0].toLowerCase())).collect(Collectors.toList());
 		}
 
-		return WorldEditManager.getSingleton().getAllowedBlocks();
+		return WorldEditManager.getSingleton().getAllowedBlocks().stream().map(String::toLowerCase).collect(Collectors.toList());
 	}
 }

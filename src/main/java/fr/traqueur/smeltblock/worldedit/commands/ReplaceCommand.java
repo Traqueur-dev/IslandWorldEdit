@@ -3,6 +3,7 @@ package fr.traqueur.smeltblock.worldedit.commands;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import fr.traqueur.smeltblock.worldedit.api.utils.Cuboid;
 import fr.traqueur.smeltblock.worldedit.managers.worldedit.WorldEditManager;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -48,8 +49,13 @@ public class ReplaceCommand implements CommandExecutor, TabCompleter {
 			Utils.sendMessage(sender, "&cVous n'avez pas ce bloc dans votre inventaire.");
 			return false;
 		}
-
-		manager.replaceBlocks((Player) sender, manager.getCuboid((Player) sender).getBlocks(), materialOld, materialNew, TypeCommand.SET);
+		Cuboid cuboid = manager.getCuboid((Player) sender);
+		if(cuboid.getVolume() >= manager.getConfig().getQuantityLimit() && manager.getConfig().getQuantityLimit() != -1) {
+			sender.sendMessage(manager.getConfig().getPrefix() + " §cLa zone sélectionée est trop grande.");
+			manager.getInWE().remove(((Player) sender).getUniqueId());
+			return true;
+		}
+		manager.replaceBlocks((Player) sender, cuboid.getBlocks(), cuboid.getVolume(), materialOld, materialNew, TypeCommand.SET);
 		return true;
 	}
 	
@@ -66,10 +72,10 @@ public class ReplaceCommand implements CommandExecutor, TabCompleter {
 		
 		if (args.length == 2) {
 			return WorldEditManager.getSingleton().getAllowedBlocks().stream()
-					.filter(s -> s.toLowerCase().startsWith(args[1].toLowerCase())).collect(Collectors.toList());
+					.map(String::toLowerCase).filter(s -> s.startsWith(args[1].toLowerCase())).collect(Collectors.toList());
 		}
 
-		return WorldEditManager.getSingleton().getAllowedBlocks();
+		return WorldEditManager.getSingleton().getAllowedBlocks().stream().map(String::toLowerCase).collect(Collectors.toList());
 	}
 
 }

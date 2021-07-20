@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import fr.traqueur.smeltblock.worldedit.api.utils.Cuboid;
+import fr.traqueur.smeltblock.worldedit.exceptions.TooManyBlocksException;
 import fr.traqueur.smeltblock.worldedit.managers.worldedit.WorldEditManager;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -57,9 +58,17 @@ public class SphereCommand implements CommandExecutor, TabCompleter {
 			return false;
 		}
 		if (Lists.newArrayList(args).contains("-h") || Lists.newArrayList(args).contains("-c")) {
-			manager.setDifferentCuboid((Player) sender, manager.getSphere((Player) sender, false), material, TypeCommand.SPHERE);
+			try {
+				manager.setDifferentCuboid((Player) sender, manager.getSphere((Player) sender, false), material, TypeCommand.SPHERE);
+			} catch (TooManyBlocksException e) {
+				return true;
+			}
 		} else {
-			manager.setDifferentCuboid((Player) sender, manager.getSphere((Player) sender, true), material, TypeCommand.SPHERE);
+			try {
+				manager.setDifferentCuboid((Player) sender, manager.getSphere((Player) sender, true), material, TypeCommand.SPHERE);
+			} catch (TooManyBlocksException e) {
+				return true;
+			}
 		}
 		
 		return true;
@@ -73,10 +82,10 @@ public class SphereCommand implements CommandExecutor, TabCompleter {
 	
 		if (args.length == 1) {
 			return WorldEditManager.getSingleton().getAllowedBlocks().stream()
-					.filter(s -> s.toLowerCase().startsWith(args[0].toLowerCase())).collect(Collectors.toList());
+					.map(String::toLowerCase).filter(s -> s.startsWith(args[0].toLowerCase())).collect(Collectors.toList());
 		}
 
-		return WorldEditManager.getSingleton().getAllowedBlocks();
+		return WorldEditManager.getSingleton().getAllowedBlocks().stream().map(String::toLowerCase).collect(Collectors.toList());
 	}
 
 }

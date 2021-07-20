@@ -1,11 +1,8 @@
 package fr.traqueur.smeltblock.worldedit.api.utils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import com.google.common.collect.Lists;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -158,9 +155,9 @@ public class Cuboid implements Iterable<Block>, Cloneable, ConfigurationSerializ
 	 * 
 	 * @return The blocks in the Cuboid
 	 */
-	public List<Block> getBlocks() {
+	public LinkedList<Block> getBlocks() {
 		Iterator<Block> blockI = this.iterator();
-		List<Block> copy = new ArrayList<Block>();
+		LinkedList<Block> copy = new LinkedList<Block>();
 		while (blockI.hasNext())
 			copy.add(blockI.next());
 		return copy;

@@ -27,8 +27,7 @@ public class CountCommand implements CommandExecutor {
 			Utils.sendMessage(sender, "&cVos positions ne sont pas définies.");
 			return false;
 		}
-		List<Block> blocks = cuboid.getBlocks();
-		Utils.sendMessage(sender, "&bVous &7avez &bx" + blocks.size() + " &7blocs dans votre selection.");
+		Utils.sendMessage(sender, "&bVous &7avez &bx" + cuboid.getVolume() + " &7blocs dans votre selection.");
 		return false;
 	}
 

@@ -14,6 +14,7 @@ import fr.traqueur.smeltblock.worldedit.api.jsons.JsonPersist;
 import fr.traqueur.smeltblock.worldedit.api.utils.Cuboid;
 import fr.traqueur.smeltblock.worldedit.api.utils.InventoryUtils;
 import fr.traqueur.smeltblock.worldedit.api.utils.Utils;
+import fr.traqueur.smeltblock.worldedit.exceptions.TooManyBlocksException;
 import fr.traqueur.smeltblock.worldedit.gui.clazz.GUItem;
 import fr.traqueur.smeltblock.worldedit.managers.profiles.ProfileManager;
 import fr.traqueur.smeltblock.worldedit.managers.worldedit.clazz.Config;
@@ -89,22 +90,20 @@ public class WorldEditManager implements JsonPersist {
         return count;
     }
 
-    public void setBlock(Player player, List<Block> cuboid, Material item,
+    public void setBlock(Player player, LinkedList<Block> cuboid, int size, Material item,
                          boolean replace, TypeCommand command) {
-        BlockRunnable runnable = new PlaceBlockToBlockRunnable(player, Lists.newLinkedList(cuboid), item, command, replace);
+        BlockRunnable runnable = new PlaceBlockToBlockRunnable(player, cuboid, size, item, command, replace);
         if(!runnable.isCancel()) {
-            this.getCuboid(player).loadChunks();
             runnable.runTaskTimer(IslandWorldEdit.getInstance(), 0, 1);
             inWE.put(player.getUniqueId(), runnable);
             this.decrementWand(player);
         }
     }
 
-    public void replaceBlocks(Player player, List<Block> cuboid, Material item,
+    public void replaceBlocks(Player player, LinkedList<Block> cuboid,int size, Material item,
                               Material newItem, TypeCommand command) {
-        BlockRunnable runnable = new ReplaceBlockToBlockRunnable(player, Lists.newLinkedList(cuboid), item, command, newItem);
+        BlockRunnable runnable = new ReplaceBlockToBlockRunnable(player, cuboid,size, item, command, newItem);
         if(!runnable.isCancel()) {
-            this.getCuboid(player).loadChunks();
             runnable.runTaskTimer(IslandWorldEdit.getInstance(), 0, 1);
             inWE.put(player.getUniqueId(), runnable);
             this.decrementWand(player);
@@ -112,24 +111,23 @@ public class WorldEditManager implements JsonPersist {
     }
 
     public void setDifferentCuboid(Player player, List<Location> cuboid, Material item, TypeCommand command) {
-        List<Block> blocks = Lists.newArrayList();
+        LinkedList<Block> blocks = Lists.newLinkedList();
         for (Location l : cuboid) {
             blocks.add(l.getBlock());
         }
-        this.setBlock(player, blocks, item, true, command);
+        this.setBlock(player, blocks, blocks.size(), item, true, command);
     }
 
-    public void destroyBlocks(Player player, List<Block> cuboid, Material item) {
-        BlockRunnable runnable = new DestroyBlockToBlockRunnable(player, Lists.newLinkedList(cuboid), item, TypeCommand.CUT);
+    public void destroyBlocks(Player player, LinkedList<Block> cuboid, int size, Material item) {
+        BlockRunnable runnable = new DestroyBlockToBlockRunnable(player, cuboid, size, item, TypeCommand.CUT);
         if(!runnable.isCancel()) {
-            this.getCuboid(player).loadChunks();
             runnable.runTaskTimer(IslandWorldEdit.getInstance(), 0, 1);
             inWE.put(player.getUniqueId(), runnable);
             this.decrementWand(player);
         }
     }
 
-    public ArrayList<Location> getWalls(Player p) {
+    public ArrayList<Location> getWalls(Player p) throws TooManyBlocksException {
         Cuboid cube = this.getCuboid(p);
         ArrayList<Location> list = new ArrayList<>();
         int minX = cube.getLowerX();
@@ -156,10 +154,17 @@ public class WorldEditManager implements JsonPersist {
             for (int y = minY; y <= maxY; y++)
                 list.add(new Location(w, x, y, maxZ));
         }
+
+        if(list.size() >= getConfig().getQuantityLimit() && getConfig().getQuantityLimit() != -1) {
+            p.sendMessage(getConfig().getPrefix() + " §cLa zone sélectionée est trop grande.");
+            getInWE().remove(p.getUniqueId());
+            throw new TooManyBlocksException();
+        }
+
         return list;
     }
 
-    public List<Location> getCyl(Player p, int height, boolean filled) {
+    public List<Location> getCyl(Player p, int height, boolean filled) throws TooManyBlocksException {
         ArrayList<Location> list = Lists.newArrayList();
         Cuboid cube = this.getCuboid(p);
         double radius = Math.max(cube.getUpperX() - cube.getLowerX(), cube.getUpperZ() - cube.getLowerZ()) / 2 + 0.5;
@@ -181,10 +186,16 @@ public class WorldEditManager implements JsonPersist {
             }
         }
 
+        if(list.size() >= getConfig().getQuantityLimit() && getConfig().getQuantityLimit() != -1) {
+            p.sendMessage(getConfig().getPrefix() + " §cLa zone sélectionée est trop grande.");
+            getInWE().remove(p.getUniqueId());
+            throw new TooManyBlocksException();
+        }
+
         return list;
     }
 
-    public List<Location> getSphere(Player p, boolean filled) {
+    public List<Location> getSphere(Player p, boolean filled) throws TooManyBlocksException {
         ArrayList<Location> list = Lists.newArrayList();
         Cuboid cube = this.getCuboid(p);
         double radius = Math.max(cube.getUpperX() - cube.getLowerX(), cube.getUpperZ() - cube.getLowerZ()) / 2 + 0.5;
@@ -204,6 +215,13 @@ public class WorldEditManager implements JsonPersist {
                 }
             }
         }
+
+        if(list.size() >= getConfig().getQuantityLimit() && getConfig().getQuantityLimit() != -1) {
+            p.sendMessage(getConfig().getPrefix() + " §cLa zone sélectionée est trop grande.");
+            getInWE().remove(p.getUniqueId());
+            throw new TooManyBlocksException();
+        }
+
         return list;
     }
 

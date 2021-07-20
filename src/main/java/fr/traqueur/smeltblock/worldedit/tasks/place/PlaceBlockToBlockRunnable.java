@@ -14,6 +14,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -24,30 +25,31 @@ public class PlaceBlockToBlockRunnable extends AbstractPlaceBlockRunnable {
     private boolean payed;
     private Block b;
 
-    public PlaceBlockToBlockRunnable(Player player, LinkedList<Block> blocks, Material item, TypeCommand command, boolean replace) {
+    public PlaceBlockToBlockRunnable(Player player, LinkedList<Block> blocks, int size, Material item, TypeCommand command, boolean replace) {
         super(player, blocks, item, replace);
         this.manager = WorldEditManager.getSingleton();
         payed = false;
         price = manager.getPrice(item, getQuantity(), command);
 
-        if(getQuantity() > this.getBlocks().size()) {
-            this.setQuantity(this.getBlocks().size());
-        }
+        player.sendMessage("quantity: " + getQuantity());
+        player.sendMessage("size :" + size);
+        player.sendMessage("limit: " + manager.getConfig().getQuantityLimit());
 
-        if (getQuantity() >= manager.getConfig().getQuantityLimit() && manager.getConfig().getQuantityLimit() != -1) {
+        if (size >= manager.getConfig().getQuantityLimit() && manager.getConfig().getQuantityLimit() != -1) {
             player.sendMessage(manager.getConfig().getPrefix() + " §cLa zone sélectionée est trop grande.");
             manager.getInWE().remove(player.getUniqueId());
             this.setCancel(true);
             return;
         }
 
-        if(getQuantity() < this.getBlocks().size()) {
-            LinkedList<Block> block = Lists.newLinkedList();
-            for(int i = 0; i < getQuantity(); i++) {
-                block.add(this.getBlocks().get(i));
-            }
-            this.setBlocks(block);
+        if(getQuantity() > size) {
+            this.setQuantity(size);
         }
+
+        if(getQuantity() < size) {
+            this.getBlocks().subList(getQuantity(), size).clear();
+        }
+
     }
 
 
@@ -102,6 +104,9 @@ public class PlaceBlockToBlockRunnable extends AbstractPlaceBlockRunnable {
         }
 
         this.saveBlock(b);
+        if(!b.getChunk().isLoaded()) {
+            b.getChunk().load();
+        }
         manager.setBlockInNativeWorld(player, b.getLocation(), this.getItem().createBlockData(), false);
         this.getBlocks().removeFirst();
 

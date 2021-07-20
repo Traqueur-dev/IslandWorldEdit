@@ -19,27 +19,24 @@ public class DestroyBlockToBlockRunnable extends AbstractDestroyBlockRunnable {
 	private boolean payed;
 	private Block b;
 	
-	public DestroyBlockToBlockRunnable(Player player, LinkedList<Block> blocks, Material item, TypeCommand command) {
+	public DestroyBlockToBlockRunnable(Player player, LinkedList<Block> blocks, int size, Material item, TypeCommand command) {
 		super(player, blocks, item);
 		this.manager = WorldEditManager.getSingleton();
 		payed = false;
 		price = manager.getPrice(item, getQuantity(), command);
+
+		if(size >= manager.getConfig().getQuantityLimit() && manager.getConfig().getQuantityLimit() != -1) {
+			player.sendMessage(manager.getConfig().getPrefix() + " §cLa zone sélectionée est trop grande.");
+			manager.getInWE().remove(player.getUniqueId());
+			this.setCancel(true);
+		}
+
 		if(getQuantity() > 2240 && !player.hasPermission("we.gui.use")) {
 			this.setQuantity(2240);
 		}
 
-		if(getQuantity() < this.getBlocks().size()) {
-			LinkedList<Block> block = Lists.newLinkedList();
-			for(int i = 0; i < getQuantity(); i++) {
-				block.add(this.getBlocks().get(i));
-			}
-			this.setBlocks(block);
-		}
-
-		if(getQuantity() >= manager.getConfig().getQuantityLimit() && manager.getConfig().getQuantityLimit() != -1) {
-			player.sendMessage(manager.getConfig().getPrefix() + " §cLa zone sélectionée est trop grande.");
-			manager.getInWE().remove(player.getUniqueId());
-			this.setCancel(true);
+		if(getQuantity() < size) {
+			this.getBlocks().subList(getQuantity(), size).clear();
 		}
 	}
 
@@ -76,11 +73,17 @@ public class DestroyBlockToBlockRunnable extends AbstractDestroyBlockRunnable {
 		if(item != null) {
 			if(item == b.getType()) {
 				this.saveBlock(b);
+				if(!b.getChunk().isLoaded()) {
+					b.getChunk().load();
+				}
 				manager.setBlockInNativeWorld(player, b.getLocation(), Material.AIR.createBlockData(), false);
 				this.getBlocks().removeFirst();
 			}
 		} else {
 			this.saveBlock(b);
+			if(!b.getChunk().isLoaded()) {
+				b.getChunk().load();
+			}
 			manager.setBlockInNativeWorld(player, b.getLocation(), Material.AIR.createBlockData(), false);
 			this.getBlocks().removeFirst();	
 		}
