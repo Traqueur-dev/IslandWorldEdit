@@ -1,5 +1,7 @@
 package fr.traqueur.smeltblock.worldedit.tasks.place;
 
+import com.google.common.collect.Lists;
+import fr.traqueur.smeltblock.worldedit.api.MultiThreading;
 import fr.traqueur.smeltblock.worldedit.api.utils.EconomyUtils;
 import fr.traqueur.smeltblock.worldedit.api.utils.InventoryUtils;
 import fr.traqueur.smeltblock.worldedit.gui.clazz.GUItem;
@@ -13,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.LinkedList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class PlaceBlockToBlockRunnable extends AbstractPlaceBlockRunnable {
 
@@ -26,25 +29,30 @@ public class PlaceBlockToBlockRunnable extends AbstractPlaceBlockRunnable {
         this.manager = WorldEditManager.getSingleton();
         payed = false;
         price = manager.getPrice(item, getQuantity(), command);
+
+        if(getQuantity() > this.getBlocks().size()) {
+            this.setQuantity(this.getBlocks().size());
+        }
+
+        if (getQuantity() >= manager.getConfig().getQuantityLimit() && manager.getConfig().getQuantityLimit() != -1) {
+            player.sendMessage(manager.getConfig().getPrefix() + " §cLa zone sélectionée est trop grande.");
+            manager.getInWE().remove(player.getUniqueId());
+            this.setCancel(true);
+            return;
+        }
+
+        if(getQuantity() < this.getBlocks().size()) {
+            LinkedList<Block> block = Lists.newLinkedList();
+            for(int i = 0; i < getQuantity(); i++) {
+                block.add(this.getBlocks().get(i));
+            }
+            this.setBlocks(block);
+        }
     }
 
 
     @Override
     public void run() {
-        if (getQuantity() >= 50000) {
-            player.sendMessage(manager.getConfig().getPrefix() + " §cLa zone sélectionée est trop grande.");
-            manager.getInWE().remove(player.getUniqueId());
-            this.cancel();
-            return;
-        }
-
-        if (this.getQuantity() == 0) {
-            player.sendMessage(manager.getConfig().getPrefix() + " §cIl n'y a aucun bloc à changer dans votre selection.");
-            manager.getInWE().remove(player.getUniqueId());
-            this.cancel();
-            return;
-        }
-
         if (!payed) {
             if (!EconomyUtils.has(player.getName(), price)) {
                 player.sendMessage(manager.getConfig().getPrefix() + " §cVous n'avez pas assez d'argent.");
@@ -58,9 +66,9 @@ public class PlaceBlockToBlockRunnable extends AbstractPlaceBlockRunnable {
             int toRemoveInInv = Math.min(globalQuantity, quantityInInventory);
             globalQuantity -= toRemoveInInv;
             InventoryUtils.decrementItem(player, new ItemStack(item), toRemoveInInv);
-            if(globalQuantity > 0) {
+            if (globalQuantity > 0) {
                 GUItem guItem = ProfileManager.getSingleton().getProfile(player).get(item);
-                if(player.hasPermission("we.gui.use") && guItem != null) {
+                if (player.hasPermission("we.gui.use") && guItem != null) {
                     guItem.remove(globalQuantity);
                 }
             }
@@ -71,6 +79,9 @@ public class PlaceBlockToBlockRunnable extends AbstractPlaceBlockRunnable {
         if (this.isCancel()) {
             this.cancel();
             this.giveBlocks();
+
+            this.getExactVolume();
+
             int placed = this.getQuantity() - this.getBlocks().size();
             if (player.hasPermission("we.gui.use")) {
                 ProfileManager.getSingleton().getProfile(player).addItem(new ItemStack(item), this.getBlocks().size());
@@ -85,8 +96,12 @@ public class PlaceBlockToBlockRunnable extends AbstractPlaceBlockRunnable {
         }
 
         b = this.getBlocks().getFirst();
-        this.saveBlock(b);
+        if (this.isIgnoredBlock(b, player) || b.getType() == item) {
+            this.getBlocks().removeFirst();
+            return;
+        }
 
+        this.saveBlock(b);
         manager.setBlockInNativeWorld(player, b.getLocation(), this.getItem().createBlockData(), false);
         this.getBlocks().removeFirst();
 

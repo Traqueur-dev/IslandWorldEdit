@@ -28,7 +28,6 @@ public abstract class AbstractReplaceBlockRunnable extends BlockRunnable {
 				quantity += profile.get(newItem).getAmount();
 			}
 		}
-		this.getExactVolume();
 	}
 	
 	public void getExactVolume() {

@@ -42,8 +42,6 @@ public abstract class BlockRunnable extends BukkitRunnable {
         ProfileManager.getSingleton().getProfile(player).init();
     }
 
-    public abstract void getExactVolume();
-
     public boolean isIgnoredBlock(Block b, Player player) {
         GenCube cube = GenCubesAPI.getCubeManager().getCubeByLocation(b.getLocation(), true);
         Cube mobcube = IslandMobCubes.getInstance().getCubeManager().getCube(b.getLocation());

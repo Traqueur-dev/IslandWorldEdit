@@ -2,6 +2,7 @@ package fr.traqueur.smeltblock.worldedit.gui.clazz;
 
 import fr.traqueur.smeltblock.worldedit.api.inventory.ClickableItem;
 import fr.traqueur.smeltblock.worldedit.api.utils.ItemBuilder;
+import fr.traqueur.smeltblock.worldedit.api.utils.Utils;
 import fr.traqueur.smeltblock.worldedit.gui.WorldEditProvider;
 import fr.traqueur.smeltblock.worldedit.managers.profiles.ProfileManager;
 import fr.traqueur.smeltblock.worldedit.managers.profiles.clazz.Profile;
@@ -38,15 +39,13 @@ public class GUItem {
             return 0;
         }
 
-        int available = (amount - quantity >= 0) ? quantity : (-amount + quantity);
-        available = (available >= amount) ? amount : available;
-
+        int available = (amount - quantity >= 0) ? quantity : amount;
         player.getInventory().addItem(new ItemStack(getMaterial(), available));
-        amount = amount - available;
+        amount -= available;
 
         if (amount <= 0) {
             ProfileManager.getSingleton().getProfile(player).removeItem(this);
-            return 0;
+            return available;
         }
 
         return available;
@@ -85,10 +84,9 @@ public class GUItem {
         lore = lore.stream().map(s -> s.replaceAll("%amount%", String.valueOf(amount))).collect(Collectors.toList());
         ItemStack item = new ItemBuilder(getMaterial()).amount(1).lore(lore).build();
 
-        ClickableItem cItem = ClickableItem.of(item, event -> {
+        return ClickableItem.of(item, event -> {
             Player player = (Player) event.getWhoClicked();
             int quantity = 0;
-
 
             if (event.getClick() == ClickType.RIGHT) {
                 if (this.hasAvailableSlot(player.getInventory(), 64)) {
@@ -105,7 +103,6 @@ public class GUItem {
                 }
                 if (quantity == 0) {
                     player.sendMessage("§c✘ Vous n'avez pas assez de place dans l'inventaire pour retirer des " + material + "§c ✘");
-                    return;
                 }
             } else {
                 if (this.hasAvailableSlot(player.getInventory(), 1)) {
@@ -115,14 +112,9 @@ public class GUItem {
                     return;
                 }
             }
-            if (amount <= 0) {
-                ProfileManager.getSingleton().getProfile(player).removeItem(this);
-            }
-            player.sendMessage("§7Vous avez retiré §a" + quantity + " " + material);
+            Utils.sendMessage(player, "§7Vous avez retiré §b" + quantity + " " + material);
             WorldEditProvider.getInventory(player, ProfileManager.getSingleton().getProfile(profile)).open(player, page);
         });
-
-        return cItem;
     }
 
     public int getAmount() {

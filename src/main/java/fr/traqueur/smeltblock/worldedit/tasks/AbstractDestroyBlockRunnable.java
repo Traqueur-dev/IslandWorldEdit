@@ -15,7 +15,6 @@ public abstract class AbstractDestroyBlockRunnable extends BlockRunnable {
 	public AbstractDestroyBlockRunnable(Player player, LinkedList<Block> blocks, Material item) {
 		super(player, blocks, item);
 		quantity = blocks.size();
-		this.getExactVolume();
 	}
 	
 	private boolean isNotSame(Material mat, Material item) {
@@ -29,18 +28,6 @@ public abstract class AbstractDestroyBlockRunnable extends BlockRunnable {
 		} else {
 			this.getBlocks().removeIf(b -> b.getType() == Material.AIR);
 		}
-
-		if(quantity > 2240 && !player.hasPermission("we.gui.use")) {
-			this.setQuantity(2240);
-		}
-		
-		if(quantity < this.getBlocks().size()) {
-			LinkedList<Block> blocks = Lists.newLinkedList();
-			for(int i = 0; i < quantity; i++) {
-				blocks.add(this.getBlocks().get(i));
-			}
-			this.setBlocks(blocks);
-		}
 	}
 
 	public int getQuantity() {
@@ -50,5 +37,4 @@ public abstract class AbstractDestroyBlockRunnable extends BlockRunnable {
 	public void setQuantity(int quantity) {
 		this.quantity = quantity;
 	}
-
 }

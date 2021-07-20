@@ -11,6 +11,7 @@ import java.util.List;
 public class Config {
 
     private String particle;
+    private int quantityLimit;
     private String prefix;
     private String separateUses;
     private String wordUses;
@@ -35,6 +36,7 @@ public class Config {
 
     public Config() {
         this.particle = Particle.VILLAGER_HAPPY.name();
+        this.quantityLimit = 50000;
         this.prefix = "§7(§9PlayerWorldEdit§7)";
         this.separateUses = ":";
         this.wordUses = "Utilisations";
@@ -225,5 +227,9 @@ public class Config {
 
     public String getGuiAddItemsName() {
         return guiAddItemsName;
+    }
+
+    public int getQuantityLimit() {
+        return quantityLimit;
     }
 }

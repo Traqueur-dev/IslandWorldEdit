@@ -26,25 +26,16 @@ public class ReplaceBlockToBlockRunnable extends AbstractReplaceBlockRunnable {
 		super(player, blocks, item, newItem);
 		this.manager = WorldEditManager.getSingleton();
 		payed = false;
-		price = manager.getPrice(item, getQuantity(), command);		
+		price = manager.getPrice(item, getQuantity(), command);
+		if(getQuantity() >= manager.getConfig().getQuantityLimit() && manager.getConfig().getQuantityLimit() != -1) {
+			player.sendMessage(manager.getConfig().getPrefix() + " §cLa zone sélectionée est trop grande.");
+			manager.getInWE().remove(player.getUniqueId());
+			this.setCancel(true);
+		}
 	}
 
 	@Override
 	public void run() {
-		if(getQuantity() >= 50000) {
-			player.sendMessage(manager.getConfig().getPrefix() + " §cLa zone sélectionée est trop grande.");
-			manager.getInWE().remove(player.getUniqueId());
-			this.cancel();
-			return;
-		}
-		
-		if(this.getQuantity() == 0) {
-			player.sendMessage(manager.getConfig().getPrefix() + " §cIl n'y a aucun bloc à changer dans votre sélection.");
-			manager.getInWE().remove(player.getUniqueId());
-			this.cancel();
-			return;
-		}
-		
 		if(!payed) {
 			if(!EconomyUtils.has(player.getName(), price)) {
 				player.sendMessage(manager.getConfig().getPrefix() + " §cVous n'avez pas assez d'argent.");
@@ -70,13 +61,14 @@ public class ReplaceBlockToBlockRunnable extends AbstractReplaceBlockRunnable {
 		if(this.isCancel()) {
 			this.cancel();
 			this.giveBlocks();
+			this.getExactVolume();
 			int placed = this.getQuantity() - this.getBlocks().size();
 			if(player.hasPermission("we.gui.use")) {
 				ProfileManager.getSingleton().getProfile(player).addItem(new ItemStack(b.getType()), this.getBlocks().size());
 			} else {
 				InventoryUtils.addItem(player, new ItemStack(b.getType()), this.getBlocks().size());
 			}
-			player.sendMessage(manager.getConfig().getPrefix() + " §bVous §7avez placé §9x" + (placed) + " " + b.getType().toString() + "§7 pour §9"
+			player.sendMessage(manager.getConfig().getPrefix() + " §bVous §7avez placé §9x" + (placed) + " " + newItem.name() + "§7 pour §9"
 					+ price + "⛁ §7.");
 			manager.getInWE().remove(player.getUniqueId());
 			return;
@@ -92,11 +84,10 @@ public class ReplaceBlockToBlockRunnable extends AbstractReplaceBlockRunnable {
 		
 		if(blocks.size() == 0) {
 			this.giveBlocks();
-			player.sendMessage(manager.getConfig().getPrefix() + " §bVous §7avez placé §9x" + (this.getQuantity()) + " " + item + "§7 pour §9"
+			player.sendMessage(manager.getConfig().getPrefix() + " §bVous §7avez placé §9x" + (this.getQuantity()) + " " + newItem.name() + "§7 pour §9"
 					+ price + "⛁ §7.");
 			manager.getInWE().remove(player.getUniqueId());
 			this.cancel();
-			return;
 		}
 	}
 }

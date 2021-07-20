@@ -91,22 +91,24 @@ public class WorldEditManager implements JsonPersist {
 
     public void setBlock(Player player, List<Block> cuboid, Material item,
                          boolean replace, TypeCommand command) {
-        this.getCuboid(player).loadChunks();
-        BlockRunnable runnable;
-        runnable = new PlaceBlockToBlockRunnable(player, Lists.newLinkedList(cuboid), item, command, replace);
-        runnable.runTaskTimer(IslandWorldEdit.getInstance(), 0, 1);
-        inWE.put(player.getUniqueId(), runnable);
-        this.decrementWand(player);
+        BlockRunnable runnable = new PlaceBlockToBlockRunnable(player, Lists.newLinkedList(cuboid), item, command, replace);
+        if(!runnable.isCancel()) {
+            this.getCuboid(player).loadChunks();
+            runnable.runTaskTimer(IslandWorldEdit.getInstance(), 0, 1);
+            inWE.put(player.getUniqueId(), runnable);
+            this.decrementWand(player);
+        }
     }
 
     public void replaceBlocks(Player player, List<Block> cuboid, Material item,
                               Material newItem, TypeCommand command) {
-        this.getCuboid(player).loadChunks();
-        BlockRunnable runnable;
-        runnable = new ReplaceBlockToBlockRunnable(player, Lists.newLinkedList(cuboid), item, command, newItem);
-        runnable.runTaskTimer(IslandWorldEdit.getInstance(), 0, 1);
-        inWE.put(player.getUniqueId(), runnable);
-        this.decrementWand(player);
+        BlockRunnable runnable = new ReplaceBlockToBlockRunnable(player, Lists.newLinkedList(cuboid), item, command, newItem);
+        if(!runnable.isCancel()) {
+            this.getCuboid(player).loadChunks();
+            runnable.runTaskTimer(IslandWorldEdit.getInstance(), 0, 1);
+            inWE.put(player.getUniqueId(), runnable);
+            this.decrementWand(player);
+        }
     }
 
     public void setDifferentCuboid(Player player, List<Location> cuboid, Material item, TypeCommand command) {
@@ -118,12 +120,13 @@ public class WorldEditManager implements JsonPersist {
     }
 
     public void destroyBlocks(Player player, List<Block> cuboid, Material item) {
-        this.getCuboid(player).loadChunks();
-        BlockRunnable runnable;
-        runnable = new DestroyBlockToBlockRunnable(player, Lists.newLinkedList(cuboid), item, TypeCommand.CUT);
-        runnable.runTaskTimer(IslandWorldEdit.getInstance(), 0, 1);
-        inWE.put(player.getUniqueId(), runnable);
-        this.decrementWand(player);
+        BlockRunnable runnable = new DestroyBlockToBlockRunnable(player, Lists.newLinkedList(cuboid), item, TypeCommand.CUT);
+        if(!runnable.isCancel()) {
+            this.getCuboid(player).loadChunks();
+            runnable.runTaskTimer(IslandWorldEdit.getInstance(), 0, 1);
+            inWE.put(player.getUniqueId(), runnable);
+            this.decrementWand(player);
+        }
     }
 
     public ArrayList<Location> getWalls(Player p) {

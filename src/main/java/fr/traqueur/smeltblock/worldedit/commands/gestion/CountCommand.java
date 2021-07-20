@@ -2,6 +2,7 @@ package fr.traqueur.smeltblock.worldedit.commands.gestion;
 
 import java.util.List;
 
+import fr.traqueur.smeltblock.worldedit.api.utils.Cuboid;
 import fr.traqueur.smeltblock.worldedit.managers.worldedit.WorldEditManager;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -21,8 +22,12 @@ public class CountCommand implements CommandExecutor {
 		}
 		
 		WorldEditManager manager = WorldEditManager.getSingleton();
-		List<Block> blocks = manager.getCuboid((Player) sender).getBlocks();
-		blocks.removeIf(b -> b.getType() == Material.AIR);
+		Cuboid cuboid = manager.getCuboid((Player) sender);
+		if (cuboid == null) {
+			Utils.sendMessage(sender, "&cVos positions ne sont pas définies.");
+			return false;
+		}
+		List<Block> blocks = cuboid.getBlocks();
 		Utils.sendMessage(sender, "&bVous &7avez &bx" + blocks.size() + " &7blocs dans votre selection.");
 		return false;
 	}

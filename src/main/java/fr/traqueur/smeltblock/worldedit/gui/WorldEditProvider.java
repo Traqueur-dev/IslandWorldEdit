@@ -110,7 +110,13 @@ public class WorldEditProvider implements InventoryProvider {
         itemM = item.getItemMeta();
         itemM.setDisplayName("§7Page précédente");
         item.setItemMeta(itemM);
-        contents.set(5,0, ClickableItem.of(item, e -> getInventory(player, profile).open(player, pagination.previous().getPage())));
+        contents.set(5,0, ClickableItem.of(item, e -> {
+            if(pagination.isFirst()) {
+                getInventory(player, profile).close(player);
+            } else {
+                getInventory(player, profile).open(player, pagination.previous().getPage());
+            }
+        }));
 
         item = headApi.getItemHead("37795");
         itemM = item.getItemMeta();

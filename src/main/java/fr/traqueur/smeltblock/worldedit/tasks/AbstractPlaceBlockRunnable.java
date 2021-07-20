@@ -28,7 +28,6 @@ public abstract class AbstractPlaceBlockRunnable extends BlockRunnable {
 				quantity += profile.get(item).getAmount();
 			}
 		}
-		this.getExactVolume();
 	}
 	
 	public void getExactVolume() {
@@ -37,18 +36,6 @@ public abstract class AbstractPlaceBlockRunnable extends BlockRunnable {
 			this.getBlocks().removeIf(b -> b.getType() == this.getItem());
 		} else {
 			this.getBlocks().removeIf(b -> b.getType() != Material.AIR);
-		}
-		
-		if(quantity > this.getBlocks().size()) {
-			this.setQuantity(this.getBlocks().size());
-		}
-		
-		if(quantity < this.getBlocks().size()) {
-			LinkedList<Block> blocks = Lists.newLinkedList();
-			for(int i = 0; i < quantity; i++) {
-				blocks.add(this.getBlocks().get(i));
-			}
-			this.setBlocks(blocks);
 		}
 	}
 
