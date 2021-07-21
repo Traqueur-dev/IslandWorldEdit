@@ -30,7 +30,7 @@ public class VisualizeRunnable extends BukkitRunnable {
             if(player != null) {
                 Cuboid cuboid = worldEditManager.getCuboid(player);
                 if(cuboid != null) {
-                    cuboid.getHollowCube(0.25).forEach(l -> ParticleEffect.FLAME.display(l, player));
+                    cuboid.getHollowCube(0.5).forEach(l -> ParticleEffect.FLAME.display(l, player));
                 }
             }
         }

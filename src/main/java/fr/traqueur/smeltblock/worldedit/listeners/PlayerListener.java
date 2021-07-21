@@ -21,6 +21,7 @@ public class PlayerListener implements Listener {
 	public void onQuit(PlayerQuitEvent event) {
 		WorldEditManager manager = WorldEditManager.getSingleton();
 		manager.eraseCorners(event.getPlayer());
+		manager.getTempVizualize().remove(event.getPlayer());
 	}
 	
 }

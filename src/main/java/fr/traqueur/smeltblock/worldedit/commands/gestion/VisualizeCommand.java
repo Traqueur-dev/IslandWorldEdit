@@ -74,6 +74,7 @@ public class VisualizeCommand implements TabExecutor {
             case "off":
                 profile.setVisualize(false);
                 Utils.sendMessage(player, "&9Visualiseur&f: &cOFF");
+                manager.getTempVizualize().remove(player);
                 break;
             case "toggle":
             case "basculer":

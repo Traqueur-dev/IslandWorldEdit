@@ -193,7 +193,7 @@ public class Cuboid implements Iterable<Block>, Cloneable, ConfigurationSerializ
 		double maxY = y2+1;
 		double maxZ = z2+1;
 
-		for (double x = minX; x <= maxX; x+=particleDistance) {
+		/*for (double x = minX; x <= maxX; x+=particleDistance) {
 			for (double y = minY; y <= maxY; y+=particleDistance) {
 				for (double z = minZ; z <= maxZ; z+=particleDistance) {
 					int components = 0;
@@ -205,6 +205,27 @@ public class Cuboid implements Iterable<Block>, Cloneable, ConfigurationSerializ
 					}
 				}
 			}
+		}*/
+
+		for(double x = minX; x <= maxX; x+=particleDistance) {
+			result.add(new Location(world, x, minY, minZ));
+			result.add(new Location(world, x, minY, maxZ));
+			result.add(new Location(world, x, maxY, minZ));
+			result.add(new Location(world, x, maxY, maxZ));
+		}
+
+		for(double y = minY; y <= maxY; y+=particleDistance) {
+			result.add(new Location(world, maxX, y, minZ));
+			result.add(new Location(world, maxX, y, maxZ));
+			result.add(new Location(world, minX, y, minZ));
+			result.add(new Location(world, minX, y, maxZ));
+		}
+
+		for(double z = minZ; z <= maxZ; z+=particleDistance) {
+			result.add(new Location(world, maxX, maxY, z));
+			result.add(new Location(world, maxX, minY, z));
+			result.add(new Location(world, minX, maxY, z));
+			result.add(new Location(world, minX, minY, z));
 		}
 
 		return result;
