@@ -21,12 +21,16 @@ import fr.traqueur.smeltblock.worldedit.managers.worldedit.clazz.Config;
 import fr.traqueur.smeltblock.worldedit.managers.worldedit.clazz.TypeCommand;
 import fr.traqueur.smeltblock.worldedit.managers.worldedit.clazz.Wand;
 import fr.traqueur.smeltblock.worldedit.tasks.BlockRunnable;
+import fr.traqueur.smeltblock.worldedit.tasks.VisualizeRunnable;
 import fr.traqueur.smeltblock.worldedit.tasks.destroy.DestroyBlockToBlockRunnable;
 import fr.traqueur.smeltblock.worldedit.tasks.place.PlaceBlockToBlockRunnable;
 import fr.traqueur.smeltblock.worldedit.tasks.replace.ReplaceBlockToBlockRunnable;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.IBlockData;
-import org.bukkit.*;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.command.CommandSender;
@@ -46,6 +50,7 @@ public class WorldEditManager implements JsonPersist {
 
     private static WorldEditManager singleton;
 
+    private Set<Player> tempVizualize;
     private HashMap<UUID, Location[]> corners;
     private HashMap<UUID, BlockRunnable> inWE;
     private Config config;
@@ -53,11 +58,11 @@ public class WorldEditManager implements JsonPersist {
 
     public WorldEditManager() {
         singleton = this;
+        this.tempVizualize = new HashSet<>();
         this.inWE = Maps.newHashMap();
         this.corners = Maps.newHashMap();
         this.config = new Config();
         this.wand = new Wand(Material.BLAZE_ROD, "Baton Magique", Arrays.asList("Lore 1", "Lore 2"));
-
     }
 
     public static WorldEditManager getSingleton() {
@@ -70,7 +75,8 @@ public class WorldEditManager implements JsonPersist {
         nmsWorld.setTypeAndData(new BlockPosition(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()), data, applyPhysics ? 3 : 2);
         loc.getBlock().setMetadata("worldEdited", new FixedMetadataValue(IslandWorldEdit.getInstance(), true));
         BoardLocalQC.inst().setPlacedByPlayer(loc.getBlock());
-        player.spawnParticle(config.getParticle(), loc, 10, 0.5,0.5,0.5);
+        player.spawnParticle(config.getParticle(), loc, 3, 0.5,0.5,0.5);
+
     }
 
     public int getAmount(Player p, Material m) {
@@ -508,4 +514,7 @@ public class WorldEditManager implements JsonPersist {
         return inWE;
     }
 
+    public Set<Player> getTempVizualize() {
+        return tempVizualize;
+    }
 }

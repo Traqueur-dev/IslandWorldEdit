@@ -16,6 +16,7 @@ import org.bukkit.entity.Player;
 import com.google.common.collect.Lists;
 
 import fr.traqueur.smeltblock.worldedit.api.utils.Utils;
+import org.bukkit.util.StringUtil;
 
 public class CutCommand implements CommandExecutor, TabCompleter {
 
@@ -56,7 +57,7 @@ public class CutCommand implements CommandExecutor, TabCompleter {
 		if (!sender.hasPermission("we.commands.cut")) {
 			return Lists.newArrayList();
 		}
-		
+
 		if (args.length == 1) {
 			return WorldEditManager.getSingleton().getAllowedBlocks().stream()
 					.map(String::toLowerCase).filter(s -> s.startsWith(args[0].toLowerCase())).collect(Collectors.toList());

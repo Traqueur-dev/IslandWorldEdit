@@ -183,6 +183,33 @@ public class Cuboid implements Iterable<Block>, Cloneable, ConfigurationSerializ
 				this.getLowerZ() + (z1 - this.getLowerZ()) / 2.0);
 	}
 
+	public List<Location> getHollowCube(double particleDistance) {
+		List<Location> result = new ArrayList<>();
+		World world = getWorld();
+		double minX = x1;
+		double minY = y1;
+		double minZ = z1;
+		double maxX = x2+1;
+		double maxY = y2+1;
+		double maxZ = z2+1;
+
+		for (double x = minX; x <= maxX; x+=particleDistance) {
+			for (double y = minY; y <= maxY; y+=particleDistance) {
+				for (double z = minZ; z <= maxZ; z+=particleDistance) {
+					int components = 0;
+					if (x == minX || x == maxX) components++;
+					if (y == minY || y == maxY) components++;
+					if (z == minZ || z == maxZ) components++;
+					if (components >= 2) {
+						result.add(new Location(world, x, y, z));
+					}
+				}
+			}
+		}
+
+		return result;
+	}
+
 	/**
 	 * Get the Cuboid's world.
 	 *

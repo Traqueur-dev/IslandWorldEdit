@@ -30,3 +30,5 @@ commands:
     aliases: calculer
   stock:
     aliases: [we,worldedit]
+  visualize:
+    aliases: visualiser

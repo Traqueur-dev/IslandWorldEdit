@@ -13,12 +13,14 @@ import fr.traqueur.smeltblock.worldedit.commands.admin.GiveWandCommand;
 import fr.traqueur.smeltblock.worldedit.commands.gestion.CancelCommand;
 import fr.traqueur.smeltblock.worldedit.commands.gestion.CountCommand;
 import fr.traqueur.smeltblock.worldedit.commands.gestion.UndoCommand;
+import fr.traqueur.smeltblock.worldedit.commands.gestion.VisualizeCommand;
 import fr.traqueur.smeltblock.worldedit.commands.gui.GuiCommand;
 import fr.traqueur.smeltblock.worldedit.listeners.InteractListener;
 import fr.traqueur.smeltblock.worldedit.listeners.JobsListener;
 import fr.traqueur.smeltblock.worldedit.listeners.PlayerListener;
 import fr.traqueur.smeltblock.worldedit.managers.profiles.ProfileManager;
 import fr.traqueur.smeltblock.worldedit.managers.worldedit.WorldEditManager;
+import fr.traqueur.smeltblock.worldedit.tasks.VisualizeRunnable;
 import me.arcaniax.hdb.api.HeadDatabaseAPI;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -69,6 +71,7 @@ public class IslandWorldEdit extends JavaPlugin {
 		this.loadCommands();
 		this.loadListeners();
 
+		new VisualizeRunnable().runTaskTimer(IslandWorldEdit.getInstance(), 0, 20);
 		MultiThreading.schedule(this::save, 0, 30, TimeUnit.HOURS);
 	}
 
@@ -94,6 +97,7 @@ public class IslandWorldEdit extends JavaPlugin {
 		this.getCommand("sphere").setExecutor(new SphereCommand());
 		this.getCommand("walls").setExecutor(new WallsCommand());
 		this.getCommand("worldedit").setExecutor(new GuiCommand());
+		this.getCommand("visualize").setExecutor(new VisualizeCommand());
 	}
 
 	@Override

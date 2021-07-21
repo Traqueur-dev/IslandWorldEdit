@@ -20,11 +20,13 @@ public class Profile {
 
     private String name;
     private List<GUItem> itemStock;
+    private boolean visualize;
     private transient LinkedList<BlockLocation> undo;
 
     public Profile(Player player) {
         this.name = player.getName();
         this.itemStock = Lists.newArrayList();
+        this.visualize = false;
         this.init();
         //itemStock.add(new GUItem(this, Material.COBBLESTONE, 9999));
     }
@@ -43,6 +45,19 @@ public class Profile {
 
     public String getName() {
         return name;
+    }
+
+    public boolean isVisualize() {
+        return visualize;
+    }
+
+    public void setVisualize(boolean visualize) {
+        this.visualize = visualize;
+    }
+
+    public boolean toggleVisualize() {
+        visualize = !visualize;
+        return visualize;
     }
 
     public void removeItem(GUItem guItem) {

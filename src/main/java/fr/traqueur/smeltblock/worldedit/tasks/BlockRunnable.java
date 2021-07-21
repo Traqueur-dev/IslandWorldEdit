@@ -80,6 +80,8 @@ public abstract class BlockRunnable extends BukkitRunnable {
 
     public void giveBlocks() {
         Profile profile = ProfileManager.getSingleton().getProfile(player);
+        WorldEditManager.getSingleton().setupCorners(player);
+        WorldEditManager.getSingleton().getTempVizualize().remove(player);
         blockForSave.forEach((item, q) -> {
             if (item != null && item.getType() != Material.AIR) {
                 if (player.hasPermission("we.gui.use")) {
