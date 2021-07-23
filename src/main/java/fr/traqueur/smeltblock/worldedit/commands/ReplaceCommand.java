@@ -69,8 +69,8 @@ public class ReplaceCommand implements CommandExecutor, TabCompleter {
 		}
 	
 		if (args.length == 1) {
-			return WorldEditManager.getSingleton().getAllowedBlocks().stream()
-					.filter(s -> s.toLowerCase().startsWith(args[0].toLowerCase())).collect(Collectors.toList());
+			return WorldEditManager.getSingleton().getAllowedBlocks().stream().map(String::toLowerCase)
+					.filter(s -> s.startsWith(args[0].toLowerCase())).collect(Collectors.toList());
 		}
 		
 		if (args.length == 2) {

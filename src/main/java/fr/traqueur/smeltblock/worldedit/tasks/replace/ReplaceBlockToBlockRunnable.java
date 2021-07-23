@@ -93,6 +93,9 @@ public class ReplaceBlockToBlockRunnable extends AbstractReplaceBlockRunnable {
 			}
 			manager.setBlockInNativeWorld(player, b.getLocation(), this.getNewItem().createBlockData(), false);
 			this.getBlocks().removeFirst();
+		} else {
+			this.saveBlock(item);
+			this.getBlocks().removeFirst();
 		}
 		
 		if(blocks.size() == 0) {

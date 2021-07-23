@@ -25,13 +25,14 @@ public class PlaceBlockToBlockRunnable extends AbstractPlaceBlockRunnable {
     private double price;
     private boolean payed;
     private Block b;
+    private boolean replace;
 
     public PlaceBlockToBlockRunnable(Player player, LinkedList<Block> blocks, int size, Material item, TypeCommand command, boolean replace) {
         super(player, blocks, item, replace);
         this.manager = WorldEditManager.getSingleton();
         payed = false;
         price = manager.getPrice(item, getQuantity(), command);
-
+        this.replace = replace;
         if (size >= manager.getConfig().getQuantityLimit() && manager.getConfig().getQuantityLimit() != -1) {
             player.sendMessage(manager.getConfig().getPrefix() + " §cLa zone sélectionée est trop grande.");
             manager.getInWE().remove(player.getUniqueId());
@@ -100,6 +101,12 @@ public class PlaceBlockToBlockRunnable extends AbstractPlaceBlockRunnable {
             this.cancel();
         }
         if (this.isIgnoredBlock(b, player) || b.getType() == item) {
+            this.saveBlock(item);
+            this.getBlocks().removeFirst();
+            return;
+        }
+
+        if(!replace && b.getType() != Material.AIR) {
             this.saveBlock(item);
             this.getBlocks().removeFirst();
             return;
