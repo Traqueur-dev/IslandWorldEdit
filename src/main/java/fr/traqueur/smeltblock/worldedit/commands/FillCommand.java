@@ -35,7 +35,11 @@ public class FillCommand implements CommandExecutor, TabCompleter {
 		}
 		
 		Material material = Material.matchMaterial(args[0]);
-		if(material == null || !manager.getAllowedBlocks().contains(material.name())) {
+		if(material == null) {
+			Utils.sendMessage(sender, "&cBlock invalide");
+			return false;
+		}
+		if (!manager.getAllowedBlocks().contains(material.name())) {
 			Utils.sendMessage(sender, "&cBlock pas autorisé par le plugin");
 			return false;
 		}

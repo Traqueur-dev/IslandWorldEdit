@@ -1,6 +1,7 @@
 package fr.traqueur.smeltblock.worldedit.tasks.destroy;
 
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 
 import com.google.common.collect.Lists;
 import fr.traqueur.smeltblock.worldedit.managers.worldedit.WorldEditManager;
@@ -63,8 +64,12 @@ public class DestroyBlockToBlockRunnable extends AbstractDestroyBlockRunnable {
 			manager.getInWE().remove(player.getUniqueId());
 			return;
 		}
-		
-		b = this.getBlocks().getFirst();
+
+		try {
+			b = this.getBlocks().getFirst();
+		} catch(NoSuchElementException e) {
+			this.cancel();
+		}
 		if(this.isIgnoredBlock(b, player)) {
 			this.getBlocks().removeFirst();
 			return;

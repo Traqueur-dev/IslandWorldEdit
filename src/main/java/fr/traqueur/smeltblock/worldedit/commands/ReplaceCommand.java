@@ -34,15 +34,18 @@ public class ReplaceCommand implements CommandExecutor, TabCompleter {
 		
 		Material materialOld = Material.matchMaterial(args[0]);
 		Material materialNew = Material.matchMaterial(args[1]);
-		if(materialOld == null || !manager.getAllowedBlocks().contains(materialOld.name())) {
-			Utils.sendMessage(sender, "&cBlock remplacé pas autorisé par le plugin");
+		if(materialOld == null || materialNew == null) {
+			Utils.sendMessage(sender, "&cBlock invalide");
 			return false;
 		}
-		
-		if(materialNew == null || !manager.getAllowedBlocks().contains(materialNew.name())) {
-			Utils.sendMessage(sender, "&cBlock remplaçant pas autorisé par le plugin");
+		if (!manager.getAllowedBlocks().contains(materialNew.name()) || !manager.getAllowedBlocks().contains(materialOld.name())) {
+			Utils.sendMessage(sender, "&cBlock pas autorisé par le plugin");
 			return false;
 		}
+
+
+
+
 		
 		int amount = manager.getAmount((Player) sender, materialNew);
 		if (amount == 0) {

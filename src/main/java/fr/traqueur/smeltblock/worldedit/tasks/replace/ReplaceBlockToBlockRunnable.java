@@ -1,6 +1,7 @@
 package fr.traqueur.smeltblock.worldedit.tasks.replace;
 
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 
 import fr.traqueur.smeltblock.worldedit.gui.clazz.GUItem;
 import fr.traqueur.smeltblock.worldedit.managers.profiles.ProfileManager;
@@ -78,8 +79,12 @@ public class ReplaceBlockToBlockRunnable extends AbstractReplaceBlockRunnable {
 			manager.getInWE().remove(player.getUniqueId());
 			return;
 		}
-		
-		b = this.getBlocks().getFirst();
+
+		try {
+			b = this.getBlocks().getFirst();
+		} catch(NoSuchElementException e) {
+			this.cancel();
+		}
 		//b.getType() == this.getItem().parseMaterial() && b.getData() == this.getItem().getData()
 		if(b.getBlockData().equals(this.getItem().createBlockData())) {
 			this.saveBlock(b);

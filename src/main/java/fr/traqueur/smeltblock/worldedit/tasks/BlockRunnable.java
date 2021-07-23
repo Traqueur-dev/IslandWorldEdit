@@ -69,13 +69,17 @@ public abstract class BlockRunnable extends BukkitRunnable {
     }
 
     public void saveBlock(Block b) {
-        ItemStack toSave = new ItemStack(b.getType());
+        this.saveBlock(b.getType());
+        ProfileManager.getSingleton().getProfile(player).save(b);
+    }
+
+    public void saveBlock(Material mat) {
+        ItemStack toSave = new ItemStack(mat);
         if (blockForSave.containsKey(toSave)) {
             blockForSave.put(toSave, blockForSave.get(toSave) + 1);
         } else {
             blockForSave.put(toSave, 1);
         }
-        ProfileManager.getSingleton().getProfile(player).save(b);
     }
 
     public void giveBlocks() {

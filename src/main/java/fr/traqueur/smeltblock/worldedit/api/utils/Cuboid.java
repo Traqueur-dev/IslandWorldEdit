@@ -193,20 +193,6 @@ public class Cuboid implements Iterable<Block>, Cloneable, ConfigurationSerializ
 		double maxY = y2+1;
 		double maxZ = z2+1;
 
-		/*for (double x = minX; x <= maxX; x+=particleDistance) {
-			for (double y = minY; y <= maxY; y+=particleDistance) {
-				for (double z = minZ; z <= maxZ; z+=particleDistance) {
-					int components = 0;
-					if (x == minX || x == maxX) components++;
-					if (y == minY || y == maxY) components++;
-					if (z == minZ || z == maxZ) components++;
-					if (components >= 2) {
-						result.add(new Location(world, x, y, z));
-					}
-				}
-			}
-		}*/
-
 		for(double x = minX; x <= maxX; x+=particleDistance) {
 			result.add(new Location(world, x, minY, minZ));
 			result.add(new Location(world, x, minY, maxZ));

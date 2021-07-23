@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import me.mraxetv.beasttokens.api.events.tokendrops.blocks.BTBlockTokenDropEvent;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -27,6 +28,19 @@ public class JobsListener implements Listener {
 				return;
 			if (b.getMetadata("worldEdited").get(0).asBoolean()) {
 				playerWorldEdited.add(event.getPlayer().getUniqueId());
+				event.setCancelled(true);
+			}
+
+		}
+	}
+
+	@EventHandler
+	public void onGainFarmPoint(BTBlockTokenDropEvent event) {
+		Block b = event.getBlock();
+		if (b != null) {
+			if (b.getMetadata("worldEdited").isEmpty())
+				return;
+			if (b.getMetadata("worldEdited").get(0).asBoolean()) {
 				event.setCancelled(true);
 			}
 

@@ -16,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class PlaceBlockToBlockRunnable extends AbstractPlaceBlockRunnable {
@@ -93,8 +94,13 @@ public class PlaceBlockToBlockRunnable extends AbstractPlaceBlockRunnable {
             return;
         }
 
-        b = this.getBlocks().getFirst();
+        try {
+            b = this.getBlocks().getFirst();
+        } catch(NoSuchElementException e) {
+            this.cancel();
+        }
         if (this.isIgnoredBlock(b, player) || b.getType() == item) {
+            this.saveBlock(item);
             this.getBlocks().removeFirst();
             return;
         }
