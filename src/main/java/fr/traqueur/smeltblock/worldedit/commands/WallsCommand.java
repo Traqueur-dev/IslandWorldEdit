@@ -1,12 +1,15 @@
 package fr.traqueur.smeltblock.worldedit.commands;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import fr.traqueur.smeltblock.worldedit.api.utils.Cuboid;
 import fr.traqueur.smeltblock.worldedit.exceptions.TooManyBlocksException;
 import fr.traqueur.smeltblock.worldedit.managers.worldedit.WorldEditManager;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -50,7 +53,8 @@ public class WallsCommand implements CommandExecutor, TabCompleter {
 		}
 
 		try {
-			manager.setDifferentCuboid((Player) sender, manager.getWalls((Player) sender), material, TypeCommand.WALLS);
+			LinkedList<Block> locs = manager.getWalls((Player) sender);
+			manager.setBlock((Player) sender, locs, locs.size(), material, true, TypeCommand.WALLS);
 		} catch (TooManyBlocksException e) {
 			return true;
 		}

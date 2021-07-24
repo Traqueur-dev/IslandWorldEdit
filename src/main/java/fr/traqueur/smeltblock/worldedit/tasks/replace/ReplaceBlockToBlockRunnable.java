@@ -80,6 +80,14 @@ public class ReplaceBlockToBlockRunnable extends AbstractReplaceBlockRunnable {
 			return;
 		}
 
+		if(blocks.size() == 0) {
+			this.giveBlocks();
+			player.sendMessage(manager.getConfig().getPrefix() + " §bVous §7avez placé §9x" + (this.getQuantity()) + " " + newItem.name() + "§7 pour §9"
+					+ price + "⛁ §7.");
+			manager.getInWE().remove(player.getUniqueId());
+			this.cancel();
+		}
+
 		b = this.getBlocks().removeFirst();
 
 		if(this.isIgnoredBlock(b, player) || b.getType() == newItem) {

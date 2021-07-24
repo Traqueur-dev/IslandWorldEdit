@@ -65,6 +65,15 @@ public class DestroyBlockToBlockRunnable extends AbstractDestroyBlockRunnable {
 			return;
 		}
 
+		if(blocks.size() == 0) {
+			this.giveBlocks();
+			int placed = this.getQuantity() - this.getBlocks().size();
+			player.sendMessage(manager.getConfig().getPrefix() + " §bVous §7avez cassé §9x" + (placed) + " blocs§7 pour §9"
+					+ price + "⛁ §7.");
+			manager.getInWE().remove(player.getUniqueId());
+			this.cancel();
+		}
+
 		b = this.getBlocks().removeFirst();
 		if(this.isIgnoredBlock(b, player)) {
 			this.getBlocks().removeFirst();

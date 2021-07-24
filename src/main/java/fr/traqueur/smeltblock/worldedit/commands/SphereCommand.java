@@ -1,5 +1,6 @@
 package fr.traqueur.smeltblock.worldedit.commands;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -7,6 +8,7 @@ import fr.traqueur.smeltblock.worldedit.api.utils.Cuboid;
 import fr.traqueur.smeltblock.worldedit.exceptions.TooManyBlocksException;
 import fr.traqueur.smeltblock.worldedit.managers.worldedit.WorldEditManager;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -63,13 +65,15 @@ public class SphereCommand implements CommandExecutor, TabCompleter {
 		}
 		if (Lists.newArrayList(args).contains("-h") || Lists.newArrayList(args).contains("-c")) {
 			try {
-				manager.setDifferentCuboid((Player) sender, manager.getSphere((Player) sender, false), material, TypeCommand.SPHERE);
+				LinkedList<Block> locs = manager.getSphere((Player) sender, false);
+				manager.setBlock((Player) sender, locs, locs.size(), material, true, TypeCommand.SPHERE);
 			} catch (TooManyBlocksException e) {
 				return true;
 			}
 		} else {
 			try {
-				manager.setDifferentCuboid((Player) sender, manager.getSphere((Player) sender, true), material, TypeCommand.SPHERE);
+				LinkedList<Block> locs = manager.getSphere((Player) sender, true);
+				manager.setBlock((Player) sender, locs, locs.size(), material, true, TypeCommand.SPHERE);
 			} catch (TooManyBlocksException e) {
 				return true;
 			}

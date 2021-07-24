@@ -116,14 +116,6 @@ public class WorldEditManager implements JsonPersist {
         }
     }
 
-    public void setDifferentCuboid(Player player, List<Location> cuboid, Material item, TypeCommand command) {
-        LinkedList<Block> blocks = Lists.newLinkedList();
-        for (Location l : cuboid) {
-            blocks.add(l.getBlock());
-        }
-        this.setBlock(player, blocks, blocks.size(), item, true, command);
-    }
-
     public void destroyBlocks(Player player, LinkedList<Block> cuboid, int size, Material item) {
         BlockRunnable runnable = new DestroyBlockToBlockRunnable(player, cuboid, size, item, TypeCommand.CUT);
         if(!runnable.isCancel()) {
@@ -133,9 +125,9 @@ public class WorldEditManager implements JsonPersist {
         }
     }
 
-    public ArrayList<Location> getWalls(Player p) throws TooManyBlocksException {
+    public LinkedList<Block> getWalls(Player p) throws TooManyBlocksException {
         Cuboid cube = this.getCuboid(p);
-        ArrayList<Location> list = new ArrayList<>();
+        LinkedList<Block> list = new LinkedList<>();
         int minX = cube.getLowerX();
         int maxX = cube.getUpperX();
         int minY = cube.getLowerY();
@@ -145,20 +137,20 @@ public class WorldEditManager implements JsonPersist {
         World w = cube.getWorld();
         for (int i = minX; i <= maxX; i++) {
             for (int y = minY; y <= maxY; y++)
-                list.add(new Location(w, i, y, minZ));
+                list.add(new Location(w, i, y, minZ).getBlock());
         }
         int z;
         for (z = minZ; z <= maxZ; z++) {
             for (int y = minY; y <= maxY; y++)
-                list.add(new Location(w, minX, y, z));
+                list.add(new Location(w, minX, y, z).getBlock());
         }
         for (z = minZ; z <= maxZ; z++) {
             for (int y = minY; y <= maxY; y++)
-                list.add(new Location(w, maxX, y, z));
+                list.add(new Location(w, maxX, y, z).getBlock());
         }
         for (int x = minX; x <= maxX; x++) {
             for (int y = minY; y <= maxY; y++)
-                list.add(new Location(w, x, y, maxZ));
+                list.add(new Location(w, x, y, maxZ).getBlock());
         }
 
         if(list.size() >= getConfig().getQuantityLimit() && getConfig().getQuantityLimit() != -1) {
@@ -170,8 +162,8 @@ public class WorldEditManager implements JsonPersist {
         return list;
     }
 
-    public List<Location> getCyl(Player p, int height, boolean filled) throws TooManyBlocksException {
-        ArrayList<Location> list = Lists.newArrayList();
+    public LinkedList<Block> getCyl(Player p, int height, boolean filled) throws TooManyBlocksException {
+        LinkedList<Block> list = new LinkedList<>();
         Cuboid cube = this.getCuboid(p);
         double radius = Math.max(cube.getUpperX() - cube.getLowerX(), cube.getUpperZ() - cube.getLowerZ()) / 2 + 0.5;
         int ceilRadius = (int) Math.ceil(radius);
@@ -185,7 +177,7 @@ public class WorldEditManager implements JsonPersist {
                                 continue;
                             }
                         }
-                        list.add(cube.getCenter().getBlock().getRelative(x, y, z).getLocation());
+                        list.add(cube.getCenter().getBlock().getRelative(x, y, z));
                     }
 
                 }
@@ -201,8 +193,8 @@ public class WorldEditManager implements JsonPersist {
         return list;
     }
 
-    public List<Location> getSphere(Player p, boolean filled) throws TooManyBlocksException {
-        ArrayList<Location> list = Lists.newArrayList();
+    public LinkedList<Block> getSphere(Player p, boolean filled) throws TooManyBlocksException {
+        LinkedList<Block> list = new LinkedList<>();
         Cuboid cube = this.getCuboid(p);
         double radius = Math.max(cube.getUpperX() - cube.getLowerX(), cube.getUpperZ() - cube.getLowerZ()) / 2 + 0.5;
         int ceilRadius = (int) Math.ceil(radius);
@@ -215,7 +207,7 @@ public class WorldEditManager implements JsonPersist {
                                 continue;
                             }
                         }
-                        list.add(cube.getCenter().getBlock().getRelative(x, y, z).getLocation());
+                        list.add(cube.getCenter().getBlock().getRelative(x, y, z));
                     }
 
                 }
