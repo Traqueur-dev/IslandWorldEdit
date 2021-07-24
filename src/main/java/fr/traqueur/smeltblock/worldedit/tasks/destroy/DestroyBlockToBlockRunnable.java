@@ -76,7 +76,6 @@ public class DestroyBlockToBlockRunnable extends AbstractDestroyBlockRunnable {
 
 		b = this.getBlocks().removeFirst();
 		if(this.isIgnoredBlock(b, player)) {
-			this.getBlocks().removeFirst();
 			return;
 		}
 

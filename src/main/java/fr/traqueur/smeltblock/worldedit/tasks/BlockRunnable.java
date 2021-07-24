@@ -11,7 +11,6 @@ import fr.traqueur.smeltblock.worldedit.managers.profiles.ProfileManager;
 import fr.traqueur.smeltblock.worldedit.managers.profiles.clazz.Profile;
 import fr.traqueur.smeltblock.worldedit.managers.worldedit.WorldEditManager;
 import fr.traqueur.smeltblock.worldedit.managers.worldedit.clazz.Config;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -53,7 +52,7 @@ public abstract class BlockRunnable extends BukkitRunnable {
         }
         if (!island.isInsideRange(b.getLocation())) return true;
 
-        if(!b.getMetadata("PROCOSMETICS_BLOCK").isEmpty()) {
+        if (!b.getMetadata("PROCOSMETICS_BLOCK").isEmpty()) {
             return true;
         }
 
@@ -87,7 +86,8 @@ public abstract class BlockRunnable extends BukkitRunnable {
         WorldEditManager.getSingleton().setupCorners(player);
         WorldEditManager.getSingleton().getTempVizualize().remove(player);
         blockForSave.forEach((item, q) -> {
-            if (item != null && item.getType() != Material.AIR) {
+            if (item != null && (item.getType() != Material.AIR ||
+                    item.getType() != Material.LAVA || item.getType() != Material.WATER)) {
                 if (player.hasPermission("we.gui.use")) {
                     profile.addItem(item, q);
                 } else {
