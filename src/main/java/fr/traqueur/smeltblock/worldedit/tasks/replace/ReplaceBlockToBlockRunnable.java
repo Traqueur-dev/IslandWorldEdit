@@ -80,11 +80,13 @@ public class ReplaceBlockToBlockRunnable extends AbstractReplaceBlockRunnable {
 			return;
 		}
 
-		try {
-			b = this.getBlocks().getFirst();
-		} catch(NoSuchElementException e) {
-			this.cancel();
+		b = this.getBlocks().removeFirst();
+
+		if(this.isIgnoredBlock(b, player) || b.getType() == newItem) {
+			this.saveBlock(newItem);
+			return;
 		}
+
 		//b.getType() == this.getItem().parseMaterial() && b.getData() == this.getItem().getData()
 		if(b.getBlockData().equals(this.getItem().createBlockData())) {
 			this.saveBlock(b);
@@ -92,10 +94,6 @@ public class ReplaceBlockToBlockRunnable extends AbstractReplaceBlockRunnable {
 				b.getChunk().load();
 			}
 			manager.setBlockInNativeWorld(player, b.getLocation(), this.getNewItem().createBlockData(), false);
-			this.getBlocks().removeFirst();
-		} else {
-			this.saveBlock(item);
-			this.getBlocks().removeFirst();
 		}
 		
 		if(blocks.size() == 0) {

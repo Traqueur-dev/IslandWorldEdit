@@ -65,11 +65,7 @@ public class DestroyBlockToBlockRunnable extends AbstractDestroyBlockRunnable {
 			return;
 		}
 
-		try {
-			b = this.getBlocks().getFirst();
-		} catch(NoSuchElementException e) {
-			this.cancel();
-		}
+		b = this.getBlocks().removeFirst();
 		if(this.isIgnoredBlock(b, player)) {
 			this.getBlocks().removeFirst();
 			return;
@@ -82,7 +78,6 @@ public class DestroyBlockToBlockRunnable extends AbstractDestroyBlockRunnable {
 					b.getChunk().load();
 				}
 				manager.setBlockInNativeWorld(player, b.getLocation(), Material.AIR.createBlockData(), false);
-				this.getBlocks().removeFirst();
 			}
 		} else {
 			this.saveBlock(b);
@@ -90,7 +85,6 @@ public class DestroyBlockToBlockRunnable extends AbstractDestroyBlockRunnable {
 				b.getChunk().load();
 			}
 			manager.setBlockInNativeWorld(player, b.getLocation(), Material.AIR.createBlockData(), false);
-			this.getBlocks().removeFirst();	
 		}
 		
 		if(blocks.size() == 0) {

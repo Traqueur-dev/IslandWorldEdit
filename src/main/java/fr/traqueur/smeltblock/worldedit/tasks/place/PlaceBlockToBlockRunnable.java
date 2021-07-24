@@ -95,20 +95,15 @@ public class PlaceBlockToBlockRunnable extends AbstractPlaceBlockRunnable {
             return;
         }
 
-        try {
-            b = this.getBlocks().getFirst();
-        } catch(NoSuchElementException e) {
-            this.cancel();
-        }
+
+        b = this.getBlocks().removeFirst();
         if (this.isIgnoredBlock(b, player) || b.getType() == item) {
             this.saveBlock(item);
-            this.getBlocks().removeFirst();
             return;
         }
 
         if(!replace && b.getType() != Material.AIR) {
             this.saveBlock(item);
-            this.getBlocks().removeFirst();
             return;
         }
 
@@ -117,7 +112,6 @@ public class PlaceBlockToBlockRunnable extends AbstractPlaceBlockRunnable {
             b.getChunk().load();
         }
         manager.setBlockInNativeWorld(player, b.getLocation(), this.getItem().createBlockData(), false);
-        this.getBlocks().removeFirst();
 
         if (blocks.size() == 0) {
             this.giveBlocks();
