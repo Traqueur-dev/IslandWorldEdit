@@ -80,7 +80,7 @@ public class ReplaceBlockToBlockRunnable extends AbstractReplaceBlockRunnable {
 			return;
 		}
 
-		if(blocks.size() == 0) {
+		if(this.getBlocks().isEmpty()) {
 			this.giveBlocks();
 			player.sendMessage(manager.getConfig().getPrefix() + " §bVous §7avez placé §9x" + (this.getQuantity()) + " " + newItem.name() + "§7 pour §9"
 					+ price + "⛁ §7.");
@@ -104,7 +104,7 @@ public class ReplaceBlockToBlockRunnable extends AbstractReplaceBlockRunnable {
 			manager.setBlockInNativeWorld(player, b.getLocation(), this.getNewItem().createBlockData(), false);
 		}
 		
-		if(blocks.size() == 0) {
+		if(this.getBlocks().isEmpty()) {
 			this.giveBlocks();
 			player.sendMessage(manager.getConfig().getPrefix() + " §bVous §7avez placé §9x" + (this.getQuantity()) + " " + newItem.name() + "§7 pour §9"
 					+ price + "⛁ §7.");

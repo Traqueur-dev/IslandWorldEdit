@@ -68,7 +68,9 @@ public abstract class BlockRunnable extends BukkitRunnable {
     }
 
     public void saveBlock(Block b) {
-        this.saveBlock(b.getType());
+        if(b.getType().isItem()) {
+            this.saveBlock(b.getType());
+        }
         ProfileManager.getSingleton().getProfile(player).save(b);
     }
 
@@ -86,8 +88,7 @@ public abstract class BlockRunnable extends BukkitRunnable {
         WorldEditManager.getSingleton().setupCorners(player);
         WorldEditManager.getSingleton().getTempVizualize().remove(player);
         blockForSave.forEach((item, q) -> {
-            if (item != null && (item.getType() != Material.AIR ||
-                    item.getType() != Material.LAVA || item.getType() != Material.WATER)) {
+            if (item != null && (item.getType() != Material.AIR)) {
                 if (player.hasPermission("we.gui.use")) {
                     profile.addItem(item, q);
                 } else {

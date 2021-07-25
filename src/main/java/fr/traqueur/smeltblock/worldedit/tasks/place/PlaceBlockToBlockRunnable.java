@@ -95,7 +95,7 @@ public class PlaceBlockToBlockRunnable extends AbstractPlaceBlockRunnable {
             return;
         }
 
-        if (blocks.size() == 0) {
+        if (this.getBlocks().isEmpty()) {
             this.giveBlocks();
             player.sendMessage(manager.getConfig().getPrefix() + " §bVous §7avez placé §9x" + (this.getQuantity()) + " " + item + "§7 pour §9"
                     + price + "⛁ §7.");
@@ -121,7 +121,7 @@ public class PlaceBlockToBlockRunnable extends AbstractPlaceBlockRunnable {
         }
         manager.setBlockInNativeWorld(player, b.getLocation(), this.getItem().createBlockData(), false);
 
-        if (blocks.size() == 0) {
+        if (this.getBlocks().isEmpty()) {
             this.giveBlocks();
             player.sendMessage(manager.getConfig().getPrefix() + " §bVous §7avez placé §9x" + (this.getQuantity()) + " " + item + "§7 pour §9"
                     + price + "⛁ §7.");

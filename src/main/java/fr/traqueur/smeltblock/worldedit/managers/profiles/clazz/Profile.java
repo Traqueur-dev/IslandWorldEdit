@@ -105,7 +105,7 @@ public class Profile {
 
         for (Map.Entry<Material, Integer> entry : countBlocks.entrySet()) {
             Material mat = entry.getKey();
-            if (mat == Material.AIR)
+            if (mat == Material.AIR || !mat.isItem())
                 continue;
 
             int amount = entry.getValue();

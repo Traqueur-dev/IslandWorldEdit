@@ -32,6 +32,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.TileState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
@@ -74,6 +75,7 @@ public class WorldEditManager implements JsonPersist {
         IBlockData data = ((CraftBlockData) blockData).getState();
         nmsWorld.setTypeAndData(new BlockPosition(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()), data, applyPhysics ? 3 : 2);
         loc.getBlock().setMetadata("worldEdited", new FixedMetadataValue(IslandWorldEdit.getInstance(), true));
+
         BoardLocalQC.inst().setPlacedByPlayer(loc.getBlock());
         player.spawnParticle(config.getParticle(), loc, 3, 0.5,0.5,0.5);
 

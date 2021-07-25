@@ -7,6 +7,7 @@ import com.google.common.collect.Lists;
 import fr.traqueur.smeltblock.worldedit.managers.worldedit.WorldEditManager;
 import fr.traqueur.smeltblock.worldedit.managers.worldedit.clazz.TypeCommand;
 import fr.traqueur.smeltblock.worldedit.tasks.AbstractDestroyBlockRunnable;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -65,15 +66,15 @@ public class DestroyBlockToBlockRunnable extends AbstractDestroyBlockRunnable {
 			return;
 		}
 
-		if(blocks.size() == 0) {
+		if(this.getBlocks().isEmpty()) {
 			this.giveBlocks();
 			int placed = this.getQuantity() - this.getBlocks().size();
 			player.sendMessage(manager.getConfig().getPrefix() + " §bVous §7avez cassé §9x" + (placed) + " blocs§7 pour §9"
 					+ price + "⛁ §7.");
 			manager.getInWE().remove(player.getUniqueId());
 			this.cancel();
+			return;
 		}
-
 		b = this.getBlocks().removeFirst();
 		if(this.isIgnoredBlock(b, player)) {
 			return;
@@ -95,7 +96,7 @@ public class DestroyBlockToBlockRunnable extends AbstractDestroyBlockRunnable {
 			manager.setBlockInNativeWorld(player, b.getLocation(), Material.AIR.createBlockData(), false);
 		}
 		
-		if(blocks.size() == 0) {
+		if(this.getBlocks().isEmpty()) {
 			this.giveBlocks();
 			int placed = this.getQuantity() - this.getBlocks().size();
 			player.sendMessage(manager.getConfig().getPrefix() + " §bVous §7avez cassé §9x" + (placed) + " blocs§7 pour §9"
