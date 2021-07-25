@@ -86,6 +86,7 @@ public class ReplaceBlockToBlockRunnable extends AbstractReplaceBlockRunnable {
 					+ price + "⛁ §7.");
 			manager.getInWE().remove(player.getUniqueId());
 			this.cancel();
+			return;
 		}
 
 		b = this.getBlocks().removeFirst();
