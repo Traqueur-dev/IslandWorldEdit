@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import de.tr7zw.changeme.nbtapi.NBTBlock;
 import me.mraxetv.beasttokens.api.events.tokendrops.blocks.BTBlockTokenDropEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
@@ -25,9 +26,10 @@ public class JobsListener implements Listener {
 	public void onGainExp(JobsExpGainEvent event) {
 		Block b = event.getBlock();
 		if (b != null) {
-			if (b.getMetadata("worldEdited").isEmpty())
+			NBTBlock block = new NBTBlock(b);
+			if (!block.getData().hasKey("worldEdited"))
 				return;
-			if (b.getMetadata("worldEdited").get(0).asBoolean()) {
+			if (block.getData().getBoolean("worldEdited")) {
 				playerWorldEdited.add(event.getPlayer().getUniqueId());
 				event.setCancelled(true);
 			}
@@ -39,13 +41,10 @@ public class JobsListener implements Listener {
 	public void onGainFarmPoint(BTBlockTokenDropEvent event) {
 		Block b = event.getBlock();
 		if (b != null) {
-			if (b.getMetadata("worldEdited").isEmpty()) {
-				Bukkit.broadcastMessage("NOT");
+			NBTBlock block = new NBTBlock(b);
+			if (!block.getData().hasKey("worldEdited"))
 				return;
-			}
-
-			if (b.getMetadata("worldEdited").get(0).asBoolean()) {
-				Bukkit.broadcastMessage("GOOD");
+			if (block.getData().getBoolean("worldEdited")) {
 				event.setCancelled(true);
 			}
 

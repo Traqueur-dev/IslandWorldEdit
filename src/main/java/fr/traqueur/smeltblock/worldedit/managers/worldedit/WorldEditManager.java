@@ -7,6 +7,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.reflect.TypeToken;
 import com.guillaumevdn.questcreator.data.BoardLocalQC;
+import de.tr7zw.changeme.nbtapi.NBTBlock;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import fr.traqueur.smeltblock.worldedit.IslandWorldEdit;
 import fr.traqueur.smeltblock.worldedit.api.jsons.DiscUtil;
@@ -71,10 +72,12 @@ public class WorldEditManager implements JsonPersist {
     }
 
     public void setBlockInNativeWorld(Player player, Location loc, BlockData blockData, boolean applyPhysics) {
+        //loc.getBlock().setMetadata("worldEdited", new FixedMetadataValue(IslandWorldEdit.getInstance(), true));
+        NBTBlock block = new NBTBlock(loc.getBlock());
+        block.getData().setBoolean("worldEdited", true);
         net.minecraft.server.v1_16_R3.World nmsWorld = ((CraftWorld) loc.getWorld()).getHandle();
         IBlockData data = ((CraftBlockData) blockData).getState();
         nmsWorld.setTypeAndData(new BlockPosition(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()), data, applyPhysics ? 3 : 2);
-        loc.getBlock().setMetadata("worldEdited", new FixedMetadataValue(IslandWorldEdit.getInstance(), true));
 
         BoardLocalQC.inst().setPlacedByPlayer(loc.getBlock());
         player.spawnParticle(config.getParticle(), loc, 3, 0.5,0.5,0.5);

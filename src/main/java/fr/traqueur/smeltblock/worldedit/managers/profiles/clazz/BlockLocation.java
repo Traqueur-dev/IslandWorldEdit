@@ -31,7 +31,7 @@ public class BlockLocation {
 
     public void undo(Profile profile) {
         Block block = location.getWorld().getBlockAt(getLocation());
-        if (block.getType() != Material.AIR) {
+        if (block.getType() != Material.AIR && block.getType().isItem()) {
             if(Bukkit.getPlayer(profile.getName()).hasPermission("we.gui.use")) {
                 profile.addItem(new ItemStack(block.getType()), 1);
             } else {
@@ -43,7 +43,7 @@ public class BlockLocation {
         WorldEditManager.getSingleton().setBlockInNativeWorld(Bukkit.getPlayer(profile.getName()), getLocation(), getMaterial().createBlockData(), false);
         block.setBlockData(data);
 
-        if (getMaterial() != Material.AIR) {
+        if (getMaterial() != Material.AIR && getMaterial().isItem()) {
             if(Bukkit.getPlayer(profile.getName()).hasPermission("we.gui.use")) {
                 if(profile.has(getMaterial())) {
                     profile.get(getMaterial()).remove(1);

@@ -51,9 +51,9 @@ public class UndoRunnable extends BukkitRunnable {
             return;
         }
 
-        BlockLocation b = undo.getFirst();
+        BlockLocation b = undo.removeFirst();
         b.undo(profile);
-        undo.removeFirst();
+
 
         if (undo.size() == 0) {
             Utils.sendMessage(player, "&bVous &7avez &9revoqué &7votre dernière action pour §9"
