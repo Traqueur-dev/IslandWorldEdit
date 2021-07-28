@@ -31,7 +31,6 @@ public class PlaceBlockToBlockRunnable extends AbstractPlaceBlockRunnable {
         super(player, blocks, item, replace);
         this.manager = WorldEditManager.getSingleton();
         payed = false;
-        price = manager.getPrice(item, getQuantity(), command);
         this.replace = replace;
         if (size >= manager.getConfig().getQuantityLimit() && manager.getConfig().getQuantityLimit() != -1) {
             player.sendMessage(manager.getConfig().getPrefix() + " §cLa zone sélectionée est trop grande.");
@@ -47,7 +46,7 @@ public class PlaceBlockToBlockRunnable extends AbstractPlaceBlockRunnable {
         if(getQuantity() < size) {
             this.getBlocks().subList(getQuantity(), size).clear();
         }
-
+        price = manager.getPrice(item, getQuantity(), command);
     }
 
 

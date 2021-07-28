@@ -25,7 +25,6 @@ public class DestroyBlockToBlockRunnable extends AbstractDestroyBlockRunnable {
 		super(player, blocks, item);
 		this.manager = WorldEditManager.getSingleton();
 		payed = false;
-		price = manager.getPrice(item, getQuantity(), command);
 
 		if(size >= manager.getConfig().getQuantityLimit() && manager.getConfig().getQuantityLimit() != -1) {
 			player.sendMessage(manager.getConfig().getPrefix() + " §cLa zone sélectionée est trop grande.");
@@ -40,6 +39,8 @@ public class DestroyBlockToBlockRunnable extends AbstractDestroyBlockRunnable {
 		if(getQuantity() < size) {
 			this.getBlocks().subList(getQuantity(), size).clear();
 		}
+
+		price = manager.getPrice(item, getQuantity(), command);
 	}
 
 	@Override

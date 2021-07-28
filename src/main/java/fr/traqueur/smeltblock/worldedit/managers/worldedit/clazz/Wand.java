@@ -36,8 +36,8 @@ public class Wand {
 			lore.add(s.replace("%pseudo%", player.getName()).replace("%utilisations%", use < 0 ? "Illimitées" : use + ""));
 		}
 		meta.setLore(lore);
+		meta.setCustomModelData(4269);
 		item.setItemMeta(meta);
-		
 		NBTItem nbtItem = new NBTItem(item);
 		nbtItem.setString("ownerName", player.getName());
 		nbtItem.setInteger("uses", use);

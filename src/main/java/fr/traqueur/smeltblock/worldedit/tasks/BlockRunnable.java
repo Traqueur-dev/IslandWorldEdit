@@ -47,9 +47,11 @@ public abstract class BlockRunnable extends BukkitRunnable {
         if (cube != null || mobcube != null) return true;
 
         Island island = SuperiorSkyblockAPI.getPlayer(player).getIsland();
+
         if (island == null) {
             return true;
         }
+
         if (!island.isInsideRange(b.getLocation())) return true;
 
         if (!b.getMetadata("PROCOSMETICS_BLOCK").isEmpty()) {
