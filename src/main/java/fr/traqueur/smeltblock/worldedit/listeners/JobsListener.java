@@ -1,18 +1,18 @@
 package fr.traqueur.smeltblock.worldedit.listeners;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
+import com.gamingmesh.jobs.api.JobsExpGainEvent;
+import com.gamingmesh.jobs.api.JobsPaymentEvent;
 import de.tr7zw.changeme.nbtapi.NBTBlock;
-import me.mraxetv.beasttokens.api.events.tokendrops.blocks.BTBlockTokenDropEvent;
-import org.bukkit.Bukkit;
+import me.mraxetv.beasttokens.api.events.tokendrops.blocks.BTMiningDropEvent;
+import me.mraxetv.beasttokens.api.events.tokendrops.blocks.BTPreMiningDropEvent;
 import org.bukkit.block.Block;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-import com.gamingmesh.jobs.api.JobsExpGainEvent;
-import com.gamingmesh.jobs.api.JobsPaymentEvent;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public class JobsListener implements Listener {
 
@@ -38,14 +38,33 @@ public class JobsListener implements Listener {
 	}
 
 	@EventHandler
-	public void onGainFarmPoint(BTBlockTokenDropEvent event) {
-		Block b = event.getBlock();
+	public void onGainFarmPoint(BTMiningDropEvent event) {
+		handle(event);
+	}
+
+	@EventHandler
+	public void onGainFarmPoint(BTPreMiningDropEvent event) {
+		handle(event);
+	}
+
+	private void handle(Event event) {
+		Block b = null;
+		if(event instanceof BTMiningDropEvent) {
+			b = ((BTMiningDropEvent) event).getBlock();
+		} else if(event instanceof BTPreMiningDropEvent) {
+			b = ((BTPreMiningDropEvent) event).getBlock();
+		}
+
 		if (b != null) {
 			NBTBlock block = new NBTBlock(b);
 			if (!block.getData().hasKey("worldEdited"))
 				return;
 			if (block.getData().getBoolean("worldEdited")) {
-				event.setCancelled(true);
+				if(event instanceof BTMiningDropEvent) {
+					((BTMiningDropEvent) event).setCancelled(true);
+				} else if(event instanceof BTPreMiningDropEvent) {
+					((BTPreMiningDropEvent) event).setCancelled(true);
+				}
 			}
 
 		}

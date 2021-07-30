@@ -6,7 +6,7 @@
 
     <groupId>fr.traqueur.smeltblock</groupId>
     <artifactId>worldedit</artifactId>
-    <version>2.3.0</version>
+    <version>2.3.1</version>
     <packaging>jar</packaging>
 
     <name>IslandWorldEdit</name>
@@ -190,7 +190,7 @@
             <artifactId>BeastTokensAPI</artifactId>
             <version>latest</version>
             <scope>system</scope>
-            <systemPath>${basedir}/libs/BeastTokensAPI-2.0.jar</systemPath>
+            <systemPath>${basedir}/libs/BeastTokens-3.9.9_8.jar</systemPath>
         </dependency>
     </dependencies>
 </project>
